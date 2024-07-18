@@ -60,32 +60,27 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      autovalidateMode: AutovalidateMode.disabled,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Spacer(),
-          const Center(child: Text("Login", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30))),
-          const Spacer(),
-          const Text("Email"),
-          Container(
-            height: 40,
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+    return Container(
+      padding: const EdgeInsets.only(bottom: 20.0), // Add padding at the bottom
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.disabled,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Sign in to your Account",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
-            child: TextFormField(
+            const SizedBox(height: 8),
+            const Text(
+              "Sign in to your Account",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
+            const Text("Email"),
+            const SizedBox(height: 8),
+            TextFormField(
               controller: _emailController,
               validator: validateEmail,
               style: const TextStyle(color: Colors.black),
@@ -93,28 +88,16 @@ class _LoginFormState extends State<LoginForm> {
                 hintText: 'example@domain.com',
                 hintStyle: const TextStyle(color: Colors.grey),
                 suffixIcon: const Icon(Icons.mail, color: Colors.black),
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
             ),
-          ),
-          const Text("Password"),
-          Container(
-            height: 40,
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: TextFormField(
+            const SizedBox(height: 20),
+            const Text("Password"),
+            const SizedBox(height: 8),
+            TextFormField(
               controller: _passwordController,
               style: const TextStyle(color: Colors.black),
               obscureText: !_isPasswordVisible,
@@ -132,53 +115,68 @@ class _LoginFormState extends State<LoginForm> {
                     });
                   },
                 ),
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
             ),
-          ),
-          Row(
-            children: [
-              Checkbox(
-                value: isChecked,
-                onChanged: (bool? value) {
-                  setState(() {
-                    isChecked = value ?? false;
-                  });
-                },
-                checkColor: Colors.black,
-                activeColor: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              GestureDetector(
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
                 onTap: () {
-                  setState(() {
-                    isChecked = !isChecked;
-                  });
+                  // Handle forgot password
                 },
                 child: const Text(
-                  "Remember Me",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black),
+                  "Forgot Password?",
+                  style: TextStyle(fontSize: 14, color: Color(0xff009fd6)),
                 ),
               ),
-            ],
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: _login,
-            child: Container(
-              height: 50,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              alignment: Alignment.center,
-              child: const Text("Log In", style: TextStyle(color: Colors.white)),
             ),
-          ),
-          const Spacer(),
-        ],
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Checkbox(
+                  value: isChecked,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked = value ?? false;
+                    });
+                  },
+                  checkColor: Colors.black,
+                  activeColor: Colors.white,
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isChecked = !isChecked;
+                    });
+                  },
+                  child: const Text(
+                    "Remember Me",
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10), // Reduced height here
+            GestureDetector(
+              onTap: _login,
+              child: Container(
+                height: 50,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xff009fd6),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: const Text("Login", style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

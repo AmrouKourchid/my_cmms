@@ -101,6 +101,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _confirmDeleteWorker(String email) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete User'),
+          content: const Text('Are you sure you want to delete the user?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      _deleteWorkerEmail(email);
+    }
+  }
+
   void _showRegisterForm() {
     showDialog(
       context: context,
@@ -118,57 +144,88 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Worker Management'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Center(
-              child: Text(
-                "Worker List",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            ..._workers.map((worker) => ListTile(
-                  leading: worker['image']!.isNotEmpty
-                      ? CircleAvatar(
-                          backgroundImage: MemoryImage(
-                            base64Decode(worker['image']!),
-                          ),
-                          onBackgroundImageError: (_, __) {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              setState(() {
-                                worker['image'] = '';
-                              });
-                            });
-                          },
-                        )
-                      : const CircleAvatar(
-                          child: Icon(Icons.person),
-                        ),
-                  title: Text(worker['email']!),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Color(0xff009fd6)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => _deleteWorkerEmail(worker['email']!),
-                        child: const Text('Delete'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
+                      const Text(
+                        "Worker List",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Below are the workers in our CMMS",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                       Padding(
+                        padding: EdgeInsets.only(right: 22.6),
+                        child: ElevatedButton(
+                          onPressed: _showRegisterForm,
+                          child: const Text(
+                            'Add',
+                            style: TextStyle(color: Color(0xff009fd6), fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                )),
-            const SizedBox(height: 16.0),
-            Center(
-              child: ElevatedButton(
-                onPressed: _showRegisterForm,
-                child: const Text('Add'),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 16.0),
+              Expanded(
+                child: ListView(
+                  children: _workers.map((worker) => ListTile(
+                    leading: worker['image']!.isNotEmpty
+                        ? CircleAvatar(
+                            backgroundImage: MemoryImage(
+                              base64Decode(worker['image']!),
+                            ),
+                            onBackgroundImageError: (_, __) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                setState(() {
+                                  worker['image'] = '';
+                                });
+                              });
+                            },
+                          )
+                        : const CircleAvatar(
+                            child: Icon(Icons.person),
+                          ),
+                    title: Text(worker['email']!),
+                    trailing: ElevatedButton(
+                      onPressed: () => _confirmDeleteWorker(worker['email']!),
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                    ),
+                  )).toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

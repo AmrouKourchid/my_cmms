@@ -98,102 +98,134 @@ class _HomeFormState extends State<HomeForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      autovalidateMode: AutovalidateMode.disabled,
+    return Container(
+      height: double.infinity,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: LinearGradient(
+          colors: [Colors.white, Color(0xff009fd6)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                  child: Text("Register Worker",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30))),
-              const SizedBox(height: 16.0),
-              const Text("Email"),
-              Container(
-                height: 35,
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black)),
-                ),
-                child: TextFormField(
-                  controller: _emailController,
-                  style: const TextStyle(color: Colors.black),
-                  decoration: const InputDecoration(
-                    hintText: 'example@domain.com',
-                    hintStyle: TextStyle(color: Colors.black54),
-                    suffixIcon: Icon(Icons.mail, color: Colors.black),
-                    border: InputBorder.none,
+        padding: const EdgeInsets.all(16.0), // Add padding around the form
+        child: Stack(
+          children: [
+            Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.disabled,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Register Worker",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text("Password"),
-              Container(
-                height: 35,
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black)),
-                ),
-                child: TextFormField(
-                  controller: _passwordController,
-                  style: const TextStyle(color: Colors.black),
-                  obscureText: !_isPasswordVisible, // Update this line
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.black,
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Fill in the details to register a new worker",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text("Email"),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _emailController,
+                    validator: validateEmail,
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                      hintText: 'example@domain.com',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      suffixIcon: const Icon(Icons.mail, color: Colors.black),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
-                    border: InputBorder.none,
                   ),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text("Image"),
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: 40,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(30),
+                  const SizedBox(height: 20),
+                  const Text("Password"),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _passwordController,
+                    style: const TextStyle(color: Colors.black),
+                    obscureText: !_isPasswordVisible,
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
                   ),
-                  alignment: Alignment.center,
-                  child: const Text("Upload Image", style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              if (_imageFile != null)
-                Image.file(
-                  _imageFile!,
-                  height: 100,
-                  width: 100,
-                ),
-              const SizedBox(height: 16.0),
-              GestureDetector(
-                onTap: _registerWorker,
-                child: Container(
-                  height: 40,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(30),
+                  const SizedBox(height: 20),
+                  
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      height: 50,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text("Upload Image", style: TextStyle(color: Colors.white, fontSize: 16)),
+                    ),
                   ),
-                  alignment: Alignment.center,
-                  child: const Text("Register", style: TextStyle(color: Colors.white)),
-                ),
+                  const SizedBox(height: 1),
+                  if (_imageFile != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Image.file(
+                        _imageFile!,
+                        height: 100,
+                        width: 100,
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: _registerWorker,
+                    child: Container(
+                      height: 50,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text("Register", style: TextStyle(color: Colors.white, fontSize: 16)),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16.0),
-            ],
-          ),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
