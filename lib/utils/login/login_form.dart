@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'validators.dart';
 import '../../screens/home_screen.dart';
+import '../../screens/worker_home_screen.dart'; // Import worker home screen
 
 class LoginForm extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     final response = await http.post(
-      Uri.parse('http://192.168.2.147:5506/login'),
+      Uri.parse('http://localhost:5506/login'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -42,13 +43,21 @@ class _LoginFormState extends State<LoginForm> {
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       final token = responseData['token'];
+      final role = responseData['role'];
 
       await _storage.write(key: 'your_secret_key', value: token);
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      if (role == 'admin') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else if (role == 'worker') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => WorkerHomeScreen(token: token)), // Navigate to worker home screen
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
