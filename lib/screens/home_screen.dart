@@ -3,8 +3,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../utils/home/add_worker.dart';
-import '../utils/home/Orders.dart';
-import '../utils/home/AllOrders.dart';
+import '../utils/home/CreateOrder.dart';
+import '../utils/home/ViewOrder.dart';
+import '../utils/home/Asset.dart'; // Import the Asset page
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -19,6 +20,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, String>> _workers = [];
   final _storage = const FlutterSecureStorage();
   int _selectedDrawerIndex = 0;
+
+  final List<String> _titles = [
+    'Worker List',
+    'Create Work Orders',
+    'View Work Orders',
+    'Assets'
+  ];
 
   @override
   void initState() {
@@ -161,6 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Orders();
       case 2:
         return AllOrders();
+      case 3:
+        return AssetPage(); // Add the Asset page
       default:
         return const Text("Error");
     }
@@ -245,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Worker Management'),
+        title: Text(_titles[_selectedDrawerIndex]),
       ),
       drawer: Drawer(
         child: ListView(
@@ -261,12 +271,16 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
-              title: Text(' Create Work Orders'),
+              title: Text('Create Work Orders'),
               onTap: () => _onSelectItem(1),
             ),
             ListTile(
               title: Text('View Work Orders'),
               onTap: () => _onSelectItem(2),
+            ),
+            ListTile(
+              title: Text('Assets'), // Add the Assets option
+              onTap: () => _onSelectItem(3),
             ),
             ListTile(
               title: Text('Logout'),

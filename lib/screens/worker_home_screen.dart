@@ -18,11 +18,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   List<dynamic> _workerOrders = [];
   final _storage = const FlutterSecureStorage();
   int _selectedDrawerIndex = 0;
+  String? _workerName;
+  String? _workerImage;
 
   @override
   void initState() {
     super.initState();
     _fetchWorkerOrders();
+    _fetchWorkerDetails();
   }
 
   void _fetchWorkerOrders() async {
@@ -39,6 +42,47 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       });
     } else {
       print('Failed to load worker orders');
+    }
+  }
+
+  void _fetchWorkerDetails() async {
+    final response = await http.get(
+      Uri.parse('http://localhost:5506/workerDetails'),
+      headers: {
+        'Authorization': 'Bearer ${widget.token}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        _workerName = data['name'];
+        _workerImage = data['image'];
+      });
+    } else {
+      print('Failed to load worker details');
+    }
+  }
+
+  void _updateWorkOrderStatus(int id, String status) async {
+    final response = await http.put(
+      Uri.parse('http://localhost:5506/updateWorkOrderStatus/$id'),
+      headers: {
+        'Authorization': 'Bearer ${widget.token}',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'status': status}),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Work order status updated to $status')),
+      );
+      _fetchWorkerOrders(); // Refresh the list
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update work order status')),
+      );
     }
   }
 
@@ -76,8 +120,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     List<dynamic> ordersForSelectedDate = _workerOrders.where((order) {
       DateTime startDate = DateTime.parse(order['start_date']);
       DateTime endDate = DateTime.parse(order['end_date']);
-      return _selectedDate.isAtSameMomentAs(startDate) ||
-             (_selectedDate.isAfter(startDate) && _selectedDate.isBefore(endDate.add(Duration(days: 1))));
+      return (order['status'] != 'closed') && 
+             (_selectedDate.isAtSameMomentAs(startDate) ||
+             (_selectedDate.isAfter(startDate) && _selectedDate.isBefore(endDate.add(Duration(days: 1)))));
     }).toList();
 
     return Column(
@@ -118,6 +163,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                     children: [
                       Text('Status: ${order['status']}'),
                       Text(order['description']),
+                      SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          String newStatus = order['status'] == 'open' ? 'in progress' : 'closed';
+                          _updateWorkOrderStatus(order['id'], newStatus);
+                        },
+                        child: Text(order['status'] == 'open' ? 'Start Working' : 'Finish Working'),
+                      ),
                     ],
                   ),
                 ),
@@ -139,9 +192,26 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         child: ListView(
           children: <Widget>[
             DrawerHeader(
-              child: Text('Worker Menu'),
               decoration: BoxDecoration(
                 color: Colors.blue,
+              ),
+              child: Column(
+                children: [
+                  _workerImage != null
+                      ? CircleAvatar(
+                          radius: 40,
+                          backgroundImage: MemoryImage(base64Decode(_workerImage!)),
+                        )
+                      : CircleAvatar(
+                          radius: 40,
+                          child: Icon(Icons.person, size: 40),
+                        ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Welcome back, ${_workerName ?? 'Worker'}',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
               ),
             ),
             ListTile(
