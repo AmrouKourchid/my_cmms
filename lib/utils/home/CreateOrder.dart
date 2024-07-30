@@ -45,7 +45,7 @@ class _OrdersState extends State<Orders> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/allWorkers'),
+      Uri.parse('http://192.168.1.18:5506/allWorkers'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -72,7 +72,7 @@ class _OrdersState extends State<Orders> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/fetchAssets'),
+      Uri.parse('http://192.168.1.18:5506/fetchAssets'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -120,7 +120,7 @@ class _OrdersState extends State<Orders> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://localhost:5506/createWorkOrder'),
+      Uri.parse('http://192.168.1.18:5506/createWorkOrder'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['worker_id'] = _selectedWorker!;

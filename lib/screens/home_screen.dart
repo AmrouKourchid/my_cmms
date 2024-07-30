@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workers'),
+      Uri.parse('http://192.168.1.18:5506/workers'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://localhost:5506/deleteWorker'),
+      Uri.parse('http://192.168.1.18:5506/deleteWorker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
