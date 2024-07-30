@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class AssetPage extends StatefulWidget {
+  const AssetPage({super.key});
+
   @override
   _AssetPageState createState() => _AssetPageState();
 }
@@ -177,7 +179,7 @@ class _AssetPageState extends State<AssetPage> {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.white, Color(0xff009fd6)],
                   begin: Alignment.topCenter,
@@ -215,7 +217,7 @@ class _AssetPageState extends State<AssetPage> {
             ),
           ),
           Container(
-            color: Color(0xff009fd6), // Set the same color as the button
+            color: const Color(0xff009fd6), // Set the same color as the button
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: ElevatedButton(
@@ -227,7 +229,7 @@ class _AssetPageState extends State<AssetPage> {
                     
                   ),
                   backgroundColor: Colors.green,
-                  minimumSize: Size(double.infinity, 50), // Change the color here
+                  minimumSize: const Size(double.infinity, 50), // Change the color here
                 ),
                 child: const Text('Add Asset', style: TextStyle(fontSize: 20, color: Colors.white)),
               ),
@@ -242,7 +244,7 @@ class _AssetPageState extends State<AssetPage> {
 class AddAssetForm extends StatefulWidget {
   final Function(String, String, String) addAsset;
 
-  AddAssetForm({required this.addAsset});
+  const AddAssetForm({super.key, required this.addAsset});
 
   @override
   _AddAssetFormState createState() => _AddAssetFormState();
@@ -250,7 +252,7 @@ class AddAssetForm extends StatefulWidget {
 
 class _AddAssetFormState extends State<AddAssetForm> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   String _selectedStatus = 'functional';
   File? _imageFile;
 
@@ -346,7 +348,7 @@ class _AddAssetFormState extends State<AddAssetForm> {
                     const SizedBox(height: 20),
                     const Text("Name"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32,
                       child: TextFormField(
                         controller: _nameController,
@@ -364,7 +366,7 @@ class _AddAssetFormState extends State<AddAssetForm> {
                     const SizedBox(height: 20),
                     const Text("Status"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32,
                       child: DropdownButtonFormField<String>(
                         value: _selectedStatus,

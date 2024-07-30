@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AllOrders extends StatefulWidget {
+  const AllOrders({super.key});
+
   @override
   _AllOrdersState createState() => _AllOrdersState();
 }
@@ -187,7 +189,7 @@ class _AllOrdersState extends State<AllOrders> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,
@@ -206,17 +208,17 @@ class _AllOrdersState extends State<AllOrders> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    margin: EdgeInsets.symmetric(vertical: 5),
+                    margin: const EdgeInsets.symmetric(vertical: 5),
                     child: ListTile(
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             order['name'],
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           IconButton(
-                            icon: Icon(Icons.close),
+                            icon: const Icon(Icons.close),
                             onPressed: () {
                               _showDeleteConfirmationDialog(order['id']);
                             },
@@ -232,7 +234,7 @@ class _AllOrdersState extends State<AllOrders> {
                           Text('End Date: ${order['end_date']}'),
                           Text('Assigned to: ${order['assigned_to']}'),
                           Text('Asset: ${order['asset_name']}'),
-                          SizedBox(height: 8), // Add some space before the button
+                          const SizedBox(height: 8), // Add some space before the button
                           ElevatedButton(
                             onPressed: () => _showDetailsDialog(order['id']),
                             child: const Text('Details'),

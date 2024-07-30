@@ -11,7 +11,7 @@ class LoginScreen extends StatelessWidget {
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,
@@ -50,8 +50,8 @@ class LoginScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
-                    child: Padding(
-                      padding: const EdgeInsets.all(25),
+                    child: const Padding(
+                      padding: EdgeInsets.all(25),
                       child: LoginForm(), // Use the LoginForm widget
                     ),
                   ),

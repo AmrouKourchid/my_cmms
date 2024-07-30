@@ -3,11 +3,12 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../utils/add_report.dart'; // Import the AddReport widget
 
 class WorkerHomeScreen extends StatefulWidget {
   final String token;
 
-  WorkerHomeScreen({required this.token});
+  const WorkerHomeScreen({super.key, required this.token});
 
   @override
   _WorkerHomeScreenState createState() => _WorkerHomeScreenState();
@@ -20,6 +21,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   int _selectedDrawerIndex = 0;
   String? _workerName;
   String? _workerImage;
+  int? _workerId; // Add this line to store the workerId
 
   @override
   void initState() {
@@ -58,6 +60,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       setState(() {
         _workerName = data['name'];
         _workerImage = data['image'];
+        _workerId = data['id']; // Ensure this is correctly fetched
       });
     } else {
       print('Failed to load worker details');
@@ -81,20 +84,110 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       _fetchWorkerOrders(); // Refresh the list
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update work order status')),
+        const SnackBar(content: Text('Failed to update work order status')),
       );
+    }
+  }
+
+  void _showDetailsDialog(int id) async {
+    final token = await _storage.read(key: 'your_secret_key');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Token not found or invalid'),
+        ),
+      );
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse('http://localhost:5506/workOrder/$id'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final order = json.decode(response.body);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(order['name']),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Status: ${order['status']}'),
+                  Text('Description: ${order['description']}'),
+                  Text('Start Date: ${order['start_date']}'),
+                  Text('End Date: ${order['end_date']}'),
+                  Text('Assigned to: ${order['assigned_to']}'),
+                  Text('Asset: ${order['asset_name']}'),
+                  if (order['images'] != null && order['images'].isNotEmpty)
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: (order['images'] as List<dynamic>).map((image) {
+                        try {
+                          return Image.memory(
+                            base64Decode(image),
+                            height: 100,
+                            width: 100,
+                          );
+                        } catch (e) {
+                          return Container(); // Handle invalid base64 strings gracefully
+                        }
+                      }).toList(),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load work order details'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showReportDialog(int workOrderId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AddReport(
+          workOrderId: workOrderId,
+          workerId: _workerId ?? 0, // Pass the workerId
+          workerName: _workerName ?? 'Worker',
+          workerImage: _workerImage ?? '',
+        );
+      },
+    );
+
+    if (result == true) {
+      _fetchWorkerOrders(); // Refresh the list if the report was submitted
     }
   }
 
   void _previousDay() {
     setState(() {
-      _selectedDate = _selectedDate.subtract(Duration(days: 1));
+      _selectedDate = _selectedDate.subtract(const Duration(days: 1));
     });
   }
 
   void _nextDay() {
     setState(() {
-      _selectedDate = _selectedDate.add(Duration(days: 1));
+      _selectedDate = _selectedDate.add(const Duration(days: 1));
     });
   }
 
@@ -120,9 +213,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     List<dynamic> ordersForSelectedDate = _workerOrders.where((order) {
       DateTime startDate = DateTime.parse(order['start_date']);
       DateTime endDate = DateTime.parse(order['end_date']);
-      return (order['status'] != 'closed') && 
+      return (order['status'] != 'closed') &&
              (_selectedDate.isAtSameMomentAs(startDate) ||
-             (_selectedDate.isAfter(startDate) && _selectedDate.isBefore(endDate.add(Duration(days: 1)))));
+             (_selectedDate.isAfter(startDate) && _selectedDate.isBefore(endDate.add(const Duration(days: 1)))));
     }).toList();
 
     return Column(
@@ -133,15 +226,15 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: Icon(Icons.arrow_left),
+                icon: const Icon(Icons.arrow_left),
                 onPressed: _previousDay,
               ),
               Text(
                 formattedDate,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               IconButton(
-                icon: Icon(Icons.arrow_right),
+                icon: const Icon(Icons.arrow_right),
                 onPressed: _nextDay,
               ),
             ],
@@ -156,20 +249,35 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 child: ListTile(
                   title: Text(
                     order['name'],
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Status: ${order['status']}'),
                       Text(order['description']),
-                      SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          String newStatus = order['status'] == 'open' ? 'in progress' : 'closed';
-                          _updateWorkOrderStatus(order['id'], newStatus);
-                        },
-                        child: Text(order['status'] == 'open' ? 'Start Working' : 'Finish Working'),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                            onPressed: () {
+                              if (order['status'] == 'open') {
+                                _updateWorkOrderStatus(order['id'], 'in progress');
+                              } else {
+                                _showReportDialog(order['id']);
+                              }
+                            },
+                            child: Text(order['status'] == 'open' ? 'Start Working' : 'Finish Working', style: const TextStyle(color: Colors.white)),
+                          ),
+                          const SizedBox(width: 8), // Add some space between the buttons
+                          ElevatedButton(
+                            onPressed: () => _showDetailsDialog(order['id']),
+                            child: const Text('Details'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -186,13 +294,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Worker Home Screen'),
+        title: const Text('Worker Home Screen'),
       ),
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.blue,
               ),
               child: Column(
@@ -202,24 +310,24 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                           radius: 40,
                           backgroundImage: MemoryImage(base64Decode(_workerImage!)),
                         )
-                      : CircleAvatar(
+                      : const CircleAvatar(
                           radius: 40,
                           child: Icon(Icons.person, size: 40),
                         ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'Welcome back, ${_workerName ?? 'Worker'}',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],
               ),
             ),
             ListTile(
-              title: Text('Work Orders'),
+              title: const Text('Work Orders'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
-              title: Text('Logout'),
+              title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');
                 Navigator.of(context).pushReplacementNamed('/login');
@@ -229,7 +337,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,

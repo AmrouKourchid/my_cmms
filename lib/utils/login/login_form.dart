@@ -7,6 +7,8 @@ import '../../screens/home_screen.dart';
 import '../../screens/worker_home_screen.dart'; // Import worker home screen
 
 class LoginForm extends StatefulWidget {
+  const LoginForm({super.key});
+
   @override
   _LoginFormState createState() => _LoginFormState();
 }
@@ -15,8 +17,8 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   bool isChecked = false;
   bool _isPasswordVisible = false;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final _storage = const FlutterSecureStorage();
 
   Future<void> _login() async {
@@ -50,7 +52,7 @@ class _LoginFormState extends State<LoginForm> {
       if (role == 'admin') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else if (role == 'worker') {
         Navigator.push(
@@ -177,7 +179,7 @@ class _LoginFormState extends State<LoginForm> {
                 height: 50,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Color(0xff009fd6),
+                  color: const Color(0xff009fd6),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,

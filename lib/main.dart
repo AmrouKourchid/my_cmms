@@ -25,10 +25,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginScreen(),
-        '/login': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen(),
-        '/worker_home': (context) => WorkerHomeScreen(token: ''), // Placeholder token
+        '/': (context) => const LoginScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/worker_home': (context) => const WorkerHomeScreen(token: ''), // Placeholder token
       },
     );
   }

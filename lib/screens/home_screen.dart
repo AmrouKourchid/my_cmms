@@ -6,8 +6,6 @@ import '../utils/home/add_worker.dart';
 import '../utils/home/CreateOrder.dart';
 import '../utils/home/ViewOrder.dart';
 import '../utils/home/Asset.dart'; // Import the Asset page
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -166,11 +164,11 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return _buildWorkerList();
       case 1:
-        return Orders();
+        return const Orders();
       case 2:
-        return AllOrders();
+        return const AllOrders();
       case 3:
-        return AssetPage(); // Add the Asset page
+        return const AssetPage(); // Add the Asset page
       default:
         return const Text("Error");
     }
@@ -183,15 +181,15 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
+            const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Worker List",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                 ),
-                const SizedBox(height: 4),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   "Below are the workers in our CMMS",
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
@@ -200,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(right: 22.6, top: 22.6),
+                  padding: const EdgeInsets.only(right: 22.6, top: 22.6),
                   child: ElevatedButton(
                     onPressed: _showRegisterForm,
                     child: const Text(
@@ -236,12 +234,12 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(worker['name']!),
               trailing: ElevatedButton(
                 onPressed: () => _confirmDeleteWorker(worker['name']!),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
                 child: const Text(
                   'Delete',
                   style: TextStyle(color: Colors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
                 ),
               ),
             )).toList(),
@@ -260,30 +258,30 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
-            DrawerHeader(
-              child: Text('Admin Menu'),
+            const DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
+              child: Text('Admin Menu'),
             ),
             ListTile(
-              title: Text('Workers'),
+              title: const Text('Workers'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
-              title: Text('Create Work Orders'),
+              title: const Text('Create Work Orders'),
               onTap: () => _onSelectItem(1),
             ),
             ListTile(
-              title: Text('View Work Orders'),
+              title: const Text('View Work Orders'),
               onTap: () => _onSelectItem(2),
             ),
             ListTile(
-              title: Text('Assets'), // Add the Assets option
+              title: const Text('Assets'), // Add the Assets option
               onTap: () => _onSelectItem(3),
             ),
             ListTile(
-              title: Text('Logout'),
+              title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');
                 Navigator.of(context).pushReplacementNamed('/login');
@@ -293,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,

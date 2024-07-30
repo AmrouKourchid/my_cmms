@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class Orders extends StatefulWidget {
+  const Orders({super.key});
+
   @override
   _OrdersState createState() => _OrdersState();
 }
@@ -87,12 +89,10 @@ class _OrdersState extends State<Orders> {
 
   Future<void> _pickImages() async {
     final pickedFiles = await ImagePicker().pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _images.addAll(pickedFiles.map((file) => File(file.path)).toList());
-      });
+    setState(() {
+      _images.addAll(pickedFiles.map((file) => File(file.path)).toList());
+    });
     }
-  }
 
   Future<void> _createWorkOrder() async {
     if (!_formKey.currentState!.validate()) {
@@ -168,7 +168,7 @@ class _OrdersState extends State<Orders> {
       body: 
         SingleChildScrollView(
           child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,

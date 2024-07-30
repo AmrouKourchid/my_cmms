@@ -7,7 +7,7 @@ class TextUtil extends StatelessWidget {
   final bool? weight;
   final String? family;
 
-  TextUtil({
+  const TextUtil({
     Key? key,
     required this.text,
     this.size,

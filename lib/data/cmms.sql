@@ -37,4 +37,18 @@ CREATE TABLE worker_orders (
   FOREIGN KEY (worker_id) REFERENCES worker(id) ON DELETE CASCADE,
   FOREIGN KEY (asset_id) REFERENCES asset(id) ON DELETE CASCADE
 );
+create table reports(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  worker_id INT NOT NULL,
+  work_order_id int not null,
+  Question1 VARCHAR(50) NOT NULL,
+  Question2 VARCHAR(50) NOT NULL,
+  Question3 VARCHAR(50) NOT NULL,
+  Question4 VARCHAR(50) NOT NULL,
+  Question5 VARCHAR(50) NOT NULL,
+  Question6 VARCHAR(50) NOT NULL,
+  pictures json,
+  FOREIGN KEY (worker_id) REFERENCES worker(id) ON DELETE CASCADE,
+  FOREIGN KEY (work_order_id) REFERENCES worker_orders(id) ON DELETE CASCADE,
+);
 insert into administrator values(1, 'admin@discovery.com', '123');

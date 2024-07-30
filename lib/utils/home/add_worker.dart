@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +19,7 @@ String? validateEmail(String? value) {
 class HomeForm extends StatefulWidget {
   final Function(String, String) addWorkerName;
 
-  HomeForm({required this.addWorkerName});
+  const HomeForm({super.key, required this.addWorkerName});
 
   @override
   _HomeFormState createState() => _HomeFormState();
@@ -28,10 +27,10 @@ class HomeForm extends StatefulWidget {
 
 class _HomeFormState extends State<HomeForm> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _ssnController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _ssnController = TextEditingController();
   String _selectedRole = 'X'; // Default role
   File? _imageFile;
   bool _isPasswordVisible = false;
@@ -112,7 +111,7 @@ class _HomeFormState extends State<HomeForm> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Colors.white, Color(0xff009fd6)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -141,7 +140,7 @@ class _HomeFormState extends State<HomeForm> {
                     const SizedBox(height: 20),
                     const Text("Name"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32, // Adjust width
                       child: TextFormField(
                         controller: _nameController,
@@ -159,7 +158,7 @@ class _HomeFormState extends State<HomeForm> {
                     const SizedBox(height: 20),
                     const Text("Email"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32, // Adjust width
                       child: TextFormField(
                         controller: _emailController,
@@ -179,7 +178,7 @@ class _HomeFormState extends State<HomeForm> {
                     const SizedBox(height: 20),
                     const Text("Password"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32, // Adjust width
                       child: TextFormField(
                         controller: _passwordController,
@@ -209,7 +208,7 @@ class _HomeFormState extends State<HomeForm> {
                     const SizedBox(height: 20),
                     const Text("Role"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32, // Adjust width
                       child: DropdownButtonFormField<String>(
                         value: _selectedRole,
@@ -235,7 +234,7 @@ class _HomeFormState extends State<HomeForm> {
                     const SizedBox(height: 20),
                     const Text("SSN"),
                     const SizedBox(height: 8),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width - 32, // Adjust width
                       child: TextFormField(
                         controller: _ssnController,
