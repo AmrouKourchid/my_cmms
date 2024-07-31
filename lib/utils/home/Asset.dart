@@ -35,7 +35,7 @@ class _AssetPageState extends State<AssetPage> {
     }
 
     final response = await http.get(
-      Uri.parse('http://192.168.1.18:5506/fetchAssets'),
+      Uri.parse('http://192.168.2.147:5506/fetchAssets'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -70,7 +70,7 @@ class _AssetPageState extends State<AssetPage> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.18:5506/addAsset'),
+      Uri.parse('http://192.168.2.147:5506/addAsset'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;
@@ -111,7 +111,7 @@ class _AssetPageState extends State<AssetPage> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://192.168.1.18:5506/deleteAsset/$id'),
+      Uri.parse('http://192.168.2.147:5506/deleteAsset/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -283,7 +283,7 @@ class _AddAssetFormState extends State<AddAssetForm> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.18:5506/addAsset'),
+      Uri.parse('http://192.168.2.147:5506/addAsset'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;

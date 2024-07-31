@@ -4,7 +4,22 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../utils/add_report.dart'; // Import the AddReport widget
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 
+Future<void> saveImage(Uint8List imageData, String imageName) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final filePath = '${directory.path}/$imageName';
+  final file = File(filePath);
+  final compressedImage = await FlutterImageCompress.compressWithList(
+    imageData,
+    quality: 70,
+  );
+  await file.writeAsBytes(compressedImage);
+  print('Image saved to $filePath');
+}
 class WorkerHomeScreen extends StatefulWidget {
   final String token;
 
@@ -32,7 +47,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _fetchWorkerOrders() async {
     final response = await http.get(
-      Uri.parse('http://192.168.1.18:5506/workerOrders'),
+      Uri.parse('http://192.168.2.147:5506/workerOrders'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
       },
@@ -49,7 +64,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _fetchWorkerDetails() async {
     final response = await http.get(
-      Uri.parse('http://192.168.1.18:5506/workerDetails'),
+      Uri.parse('http://192.168.2.147:5506/workerDetails'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
       },
@@ -69,7 +84,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _updateWorkOrderStatus(int id, String status) async {
     final response = await http.put(
-      Uri.parse('http://192.168.1.18:5506/updateWorkOrderStatus/$id'),
+      Uri.parse('http://192.168.2.147:5506/updateWorkOrderStatus/$id'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
         'Content-Type': 'application/json',
@@ -101,7 +116,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://192.168.1.18:5506/workOrder/$id'),
+      Uri.parse('http://192.168.2.147:5506/workOrder/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -112,43 +127,72 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text(order['name']),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Status: ${order['status']}'),
-                  Text('Description: ${order['description']}'),
-                  Text('Start Date: ${order['start_date']}'),
-                  Text('End Date: ${order['end_date']}'),
-                  Text('Assigned to: ${order['assigned_to']}'),
-                  Text('Asset: ${order['asset_name']}'),
-                  if (order['images'] != null && order['images'].isNotEmpty)
-                    Wrap(
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      children: (order['images'] as List<dynamic>).map((image) {
-                        try {
-                          return Image.memory(
-                            base64Decode(image),
-                            height: 100,
-                            width: 100,
-                          );
-                        } catch (e) {
-                          return Container(); // Handle invalid base64 strings gracefully
-                        }
-                      }).toList(),
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0), // Rounded corners for the dialog
+            ),
+            elevation: 5.0, // Adds shadow under the dialog
+            backgroundColor: Colors.transparent, // Make dialog background transparent
+            child: Container(
+              padding: EdgeInsets.all(20.0), // Padding inside the dialog
+              width: MediaQuery.of(context).size.width * 0.9, // Dialog width is 90% of screen width
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0), // Match dialog rounded corners
+                gradient: LinearGradient(
+                  colors: [Colors.white, Color(0xff009fd6)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: SingleChildScrollView( // Use SingleChildScrollView to handle overflow
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(order['name'], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text('Status: ${order['status']}'),
+                    Text('Description: ${order['description']}'),
+                    Text('Start Date: ${order['start_date']}'),
+                    Text('End Date: ${order['end_date']}'),
+                    Text('Assigned to: ${order['assigned_to']}'),
+                    Text('Asset: ${order['asset_name']}'),
+                    if (order['images'] != null && order['images'].isNotEmpty)
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: (order['images'] as List<dynamic>).map((image) {
+                          if (image != null) {
+                            final imageData = base64Decode(image);
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.memory(
+                                  imageData,
+                                  height: 100,
+                                  width: 100,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.download),
+                                  onPressed: () => saveImage(imageData, 'downloadedImage.jpg'),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Container(); // or some placeholder
+                          }
+                        }).toList(),
+                      ),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Close'),
+                      ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
           );
         },
       );

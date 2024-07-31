@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:flutter/material.dart';
 class ViewReport extends StatelessWidget {
   final int workOrderId;
   const ViewReport({Key? key, required this.workOrderId}) : super(key: key);
@@ -11,14 +11,13 @@ class ViewReport extends StatelessWidget {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'your_secret_key');
     final response = await http.get(
-      Uri.parse('http://192.168.1.18:5506/reportByWorkOrderId/$workOrderId'),
+      Uri.parse('http://192.168.2.147:5506/reportByWorkOrderId/$workOrderId'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      // Log the status code and response body for debugging
       print('Failed to load report, Status code: ${response.statusCode}, Body: ${response.body}');
       throw Exception('Failed to load report, Status code: ${response.statusCode}');
     }
@@ -37,19 +36,45 @@ class ViewReport extends StatelessWidget {
           final report = snapshot.data;
           return AlertDialog(
             backgroundColor: Colors.transparent,
-            title: Text('Report for Work Order ID: $workOrderId'),
+            title: Text('Report for Work Order ID: $workOrderId', style: Theme.of(context).textTheme.titleSmall ?? TextStyle()),
             content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text('Worker Name: ${report['worker_name']}'),
-                  Text('Question 1: ${report['Question1']}'),
-                  Text('Question 2: ${report['Question2']}'),
-                  Text('Question 3: ${report['Question3']}'),
-                  Text('Question 4: ${report['Question4']}'),
-                  Text('Question 5: ${report['Question5']}'),
-                  Text('Question 6: ${report['Question6']}'),
-                  ...report['pictures'].map((pic) => Image.memory(base64Decode(pic))),
-                ],
+              child: Form(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      initialValue: report['worker_name'],
+                      decoration: const InputDecoration(
+                        labelText: 'Worker Name',
+                        border: OutlineInputBorder(),
+                        enabled: false,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ...List.generate(6, (index) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          initialValue: report['question${index + 1}'],
+                          decoration: InputDecoration(
+                            labelText: 'Question ${index + 1}',
+                            border: const OutlineInputBorder(),
+                            enabled: false,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    )),
+                    if (report['pictures'] != null && report['pictures'].isNotEmpty)
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: report['pictures'].map((pic) {
+                          return Image.memory(base64Decode(pic), height: 100, width: 100);
+                        }).toList(),
+                      ),
+                  ],
+                ),
               ),
             ),
             actions: <Widget>[
