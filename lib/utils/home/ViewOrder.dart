@@ -162,7 +162,7 @@ class _AllOrdersState extends State<AllOrders> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text('Close', style: TextStyle(fontSize: 16)),
+                        child: Text('Close', style: TextStyle(fontSize: 16, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -471,7 +471,7 @@ class _ViewReportState extends State<ViewReport> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Close', style: TextStyle(fontSize: 16)),
+                  child: Text('Close', style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
               ),
             ],
