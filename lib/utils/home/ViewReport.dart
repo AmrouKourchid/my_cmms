@@ -11,7 +11,7 @@ class ViewReport extends StatelessWidget {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'your_secret_key');
     final response = await http.get(
-      Uri.parse('http://192.168.2.147:5506/reportByWorkOrderId/$workOrderId'),
+      Uri.parse('http://localhost:5506/reportByWorkOrderId/$workOrderId'),
       headers: {'Authorization': 'Bearer $token'},
     );
 

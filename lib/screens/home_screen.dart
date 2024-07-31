@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://192.168.2.147:5506/workers'),
+      Uri.parse('http://localhost:5506/workers'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://192.168.2.147:5506/deleteWorker'),
+      Uri.parse('http://localhost:5506/deleteWorker'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -265,22 +265,27 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Admin Menu'),
             ),
             ListTile(
+              leading: Icon(Icons.group),
               title: const Text('Workers'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
+              leading: Icon(Icons.add_circle_outline),
               title: const Text('Create Work Orders'),
               onTap: () => _onSelectItem(1),
             ),
             ListTile(
+              leading: Icon(Icons.view_list),
               title: const Text('View Work Orders'),
               onTap: () => _onSelectItem(2),
             ),
             ListTile(
-              title: const Text('Assets'), // Add the Assets option
+              leading: Icon(Icons.account_balance),
+              title: const Text('Assets'),
               onTap: () => _onSelectItem(3),
             ),
             ListTile(
+              leading: Icon(Icons.exit_to_app),
               title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');

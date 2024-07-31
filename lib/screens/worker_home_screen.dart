@@ -4,22 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../utils/add_report.dart'; // Import the AddReport widget
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:path_provider/path_provider.dart';
 
-Future<void> saveImage(Uint8List imageData, String imageName) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/$imageName';
-  final file = File(filePath);
-  final compressedImage = await FlutterImageCompress.compressWithList(
-    imageData,
-    quality: 70,
-  );
-  await file.writeAsBytes(compressedImage);
-  print('Image saved to $filePath');
-}
 class WorkerHomeScreen extends StatefulWidget {
   final String token;
 
@@ -36,7 +22,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   int _selectedDrawerIndex = 0;
   String? _workerName;
   String? _workerImage;
-  int? _workerId; // Add this line to store the workerId
+  int? _workerId;
 
   @override
   void initState() {
@@ -75,7 +61,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       setState(() {
         _workerName = data['name'];
         _workerImage = data['image'];
-        _workerId = data['id']; // Ensure this is correctly fetched
+        _workerId = data['id'];
       });
     } else {
       print('Failed to load worker details');
@@ -96,12 +82,33 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Work order status updated to $status')),
       );
-      _fetchWorkerOrders(); // Refresh the list
+      _fetchWorkerOrders();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to update work order status')),
       );
     }
+  }
+
+  void _showImageDialog(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 500,
+            height: 500,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: MemoryImage(imageData),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showDetailsDialog(int id) async {
@@ -129,22 +136,22 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         builder: (context) {
           return Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0), // Rounded corners for the dialog
+              borderRadius: BorderRadius.circular(20.0),
             ),
-            elevation: 5.0, // Adds shadow under the dialog
-            backgroundColor: Colors.transparent, // Make dialog background transparent
+            elevation: 5.0,
+            backgroundColor: Colors.transparent,
             child: Container(
-              padding: EdgeInsets.all(20.0), // Padding inside the dialog
-              width: MediaQuery.of(context).size.width * 0.9, // Dialog width is 90% of screen width
+              padding: EdgeInsets.all(20.0),
+              width: MediaQuery.of(context).size.width * 0.9,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0), // Match dialog rounded corners
+                borderRadius: BorderRadius.circular(20.0),
                 gradient: LinearGradient(
                   colors: [Colors.white, Color(0xff009fd6)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
               ),
-              child: SingleChildScrollView( // Use SingleChildScrollView to handle overflow
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -162,22 +169,16 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                         children: (order['images'] as List<dynamic>).map((image) {
                           if (image != null) {
                             final imageData = base64Decode(image);
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.memory(
-                                  imageData,
-                                  height: 100,
-                                  width: 100,
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.download),
-                                  onPressed: () => saveImage(imageData, 'downloadedImage.jpg'),
-                                ),
-                              ],
+                            return GestureDetector(
+                              onTap: () => _showImageDialog(imageData),
+                              child: Image.memory(
+                                imageData,
+                                height: 100,
+                                width: 100,
+                              ),
                             );
                           } else {
-                            return Container(); // or some placeholder
+                            return Container();
                           }
                         }).toList(),
                       ),
@@ -204,6 +205,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       );
     }
   }
+
+  // ... remaining methods and build method ...
+
 
   Future<void> _showReportDialog(int workOrderId) async {
     final result = await showDialog<bool>(
@@ -367,10 +371,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               ),
             ),
             ListTile(
+              leading: Icon(Icons.view_list),
               title: const Text('Work Orders'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
+              leading: Icon(Icons.exit_to_app),
               title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');

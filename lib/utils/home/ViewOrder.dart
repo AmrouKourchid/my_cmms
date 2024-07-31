@@ -5,36 +5,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:ui'; // Import dart:ui to use ImageFilter
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<File?> compressFile(File file) async {
-  final filePath = file.absolute.path;
-  final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
-  final splitted = filePath.substring(0, (lastIndex));
-  final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
-  var result = await FlutterImageCompress.compressAndGetFile(
-    file.absolute.path, outPath,
-    quality: 88,
-  );
-   if (result != null) {
-    return File(result.path);
-  }
-  return null;
-}
+
 
 Future<void> saveImage(Uint8List imageData, String imageName) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/$imageName';
-  final file = File(filePath);
-  final compressedImage = await FlutterImageCompress.compressWithList(
-    imageData,
-    quality: 70,
-  );
-  await file.writeAsBytes(compressedImage);
-  print('Image saved to $filePath');
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$imageName';
+    final file = File(filePath);
+    await file.writeAsBytes(imageData);
+    print('Image saved to $filePath');
+  } catch (e) {
+    print('Failed to save image: $e');
+  }
 }
-
 class AllOrders extends StatefulWidget {
   const AllOrders({super.key});
 
@@ -77,6 +62,27 @@ class _AllOrdersState extends State<AllOrders> {
     } else {
       print('Failed to load work orders');
     }
+  }
+
+  void _showImageDialog(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 500,
+            height: 500,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: MemoryImage(imageData),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showDetailsDialog(int id) async {
@@ -138,19 +144,13 @@ class _AllOrdersState extends State<AllOrders> {
                         children: (order['images'] as List<dynamic>).map((image) {
                           try {
                             final imageData = base64Decode(image);
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.memory(
-                                  imageData,
-                                  height: 100,
-                                  width: 100,
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.download),
-                                  onPressed: () => saveImage(imageData, 'downloadedImage.jpg'),
-                                ),
-                              ],
+                            return GestureDetector(
+                              onTap: () => _showImageDialog(imageData),
+                              child: Image.memory(
+                                imageData,
+                                height: 100,
+                                width: 100,
+                              ),
                             );
                           } catch (e) {
                             return Container(); // Handle invalid base64 strings gracefully
@@ -182,44 +182,30 @@ class _AllOrdersState extends State<AllOrders> {
   }
 
   Widget _buildWorkOrderCard(dynamic order) {
-    return SingleChildScrollView(
-      child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      child: Stack(
-        children: [
-          Positioned(
-            right: 0,
-            top: 0,
-            child: IconButton(
-              icon: Icon(Icons.close), // Using 'close' icon which looks like an 'X'
-              onPressed: () => _confirmDelete(order['id']),
-            ),
-          ),
-          ListTile(
-            title: Text(
-              order['name'],
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Stack(
+          children: [
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  order['name'],
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
                 Text('Status: ${order['status']}'),
                 Text('Description: ${order['description']}'),
                 Text('Start Date: ${order['start_date']}'),
                 Text('End Date: ${order['end_date']}'),
                 Text('Assigned to: ${order['assigned_to']}'),
                 Text('Asset: ${order['asset_name']}'),
+                SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                      ),
                       onPressed: () => _showDetailsDialog(order['id']),
                       child: const Text('Details', style: TextStyle(color: Color(0xff009fd6))),
                     ),
@@ -247,10 +233,17 @@ class _AllOrdersState extends State<AllOrders> {
                 ),
               ],
             ),
-          ),
-        ],
+            Positioned(
+              right: 0,
+              top: 0,
+              child: IconButton(
+                icon: Icon(Icons.close), // Using 'close' icon which looks like an 'X'
+                onPressed: () => _confirmDelete(order['id']),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -283,7 +276,7 @@ class _AllOrdersState extends State<AllOrders> {
   void _deleteWorkOrder(int id) async {
     final token = await _storage.read(key: 'your_secret_key');
     final response = await http.delete(
-      Uri.parse('http://192.168.2.147:5506/deleteWorkOrder/$id'),
+      Uri.parse('http://localhost:5506/deleteWorkOrder/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -366,7 +359,7 @@ class _ViewReportState extends State<ViewReport> {
     }
 
     final response = await http.get(
-      Uri.parse('http://192.168.2.147:5506/reportByWorkOrderId/${widget.workOrderId}'),
+      Uri.parse('http://localhost:5506/reportByWorkOrderId/${widget.workOrderId}'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -396,6 +389,27 @@ class _ViewReportState extends State<ViewReport> {
         ),
         readOnly: true,
       ),
+    );
+  }
+
+  void _showImageDialog(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 500,
+            height: 500,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: MemoryImage(imageData),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -439,19 +453,13 @@ class _ViewReportState extends State<ViewReport> {
                   children: (_report['pictures'] as List<dynamic>).map((image) {
                     try {
                       final imageData = base64Decode(image);
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.memory(
-                            imageData,
-                            height: 100,
-                            width: 100,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.download),
-                            onPressed: () => saveImage( imageData, 'downloadedImage.jpg'),
-                          ),
-                        ],
+                      return GestureDetector(
+                        onTap: () => _showImageDialog(imageData),
+                        child: Image.memory(
+                          imageData,
+                          height: 100,
+                          width: 100,
+                        ),
                       );
                     } catch (e) {
                       return Container(); // Handle invalid base64 strings gracefully
