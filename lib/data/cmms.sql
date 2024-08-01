@@ -17,6 +17,13 @@ CREATE TABLE worker (
   ssn VARCHAR(20) NOT NULL
 );
 
+create table Client (
+	id int auto_increment primary key,
+    name varchar(100) not null, 
+    email varchar(50) not null,
+    password varchar(50) not null
+);
+
 CREATE TABLE asset (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
@@ -49,6 +56,20 @@ create table reports(
   Question6 VARCHAR(50) NOT NULL,
   pictures json,
   FOREIGN KEY (worker_id) REFERENCES worker(id) ON DELETE CASCADE,
-  FOREIGN KEY (work_order_id) REFERENCES worker_orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (work_order_id) REFERENCES worker_orders(id) ON DELETE CASCADE
 );
+
+create table work_request(
+id int auto_increment primary key,
+client_id int not null,
+site varchar(50) not null,
+asset_id int not null,
+date_of_fault date not null,
+description varchar(50) not null,
+foreign key (asset_id) references asset(id),
+foreign key (client_id) references client(id)
+);
+
+
 insert into administrator values(1, 'admin@discovery.com', '123');
+select * from reports;

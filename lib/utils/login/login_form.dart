@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'validators.dart';
 import '../../screens/home_screen.dart';
 import '../../screens/worker_home_screen.dart'; // Import worker home screen
+import '../../screens/client_home_screen.dart'; // Import client home screen
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -58,6 +59,12 @@ class _LoginFormState extends State<LoginForm> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => WorkerHomeScreen(token: token)), // Navigate to worker home screen
+        );
+      }
+      else if (role == 'client') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ClientHomeScreen(token: token)), // Navigate to client home screen
         );
       }
     } else {

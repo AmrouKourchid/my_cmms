@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:snow_login/screens/login_screen.dart';
 import 'package:snow_login/screens/home_screen.dart';
 import 'package:snow_login/screens/worker_home_screen.dart';
+import 'package:snow_login/screens/client_home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
-        '/worker_home': (context) => const WorkerHomeScreen(token: ''), // Placeholder token
+        '/worker_home': (context) => const WorkerHomeScreen(token: ''),
+        '/client_home': (context) => const ClientHomeScreen(token: ''), // Placeholder token
       },
     );
   }
