@@ -51,6 +51,7 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   Future<void> _addAsset(String name, String status, String imagePath) async {
+    if (_isAddingAsset) return;
     setState(() {
       _isAddingAsset = true;
     });
@@ -237,7 +238,10 @@ class _AssetPageState extends State<AssetPage> {
       context: context,
       builder: (context) {
         return Dialog(
-          child: AddAssetForm(addAsset: _addAsset),
+          child: AddAssetForm(
+            addAsset: _addAsset,
+            onAssetAdded: _fetchAssets,
+          ),
         );
       },
     );
@@ -324,8 +328,9 @@ class _AssetPageState extends State<AssetPage> {
 
 class AddAssetForm extends StatefulWidget {
   final Function(String, String, String) addAsset;
+  final VoidCallback onAssetAdded;
 
-  const AddAssetForm({super.key, required this.addAsset});
+  const AddAssetForm({super.key, required this.addAsset, required this.onAssetAdded});
 
   @override
   _AddAssetFormState createState() => _AddAssetFormState();
@@ -336,10 +341,16 @@ class _AddAssetFormState extends State<AddAssetForm> {
   final TextEditingController _nameController = TextEditingController();
   String _selectedStatus = 'functional';
   File? _imageFile;
+  bool _isAddingAsset = false;
 
   final _storage = const FlutterSecureStorage();
 
   Future<void> _addAsset() async {
+    if (_isAddingAsset) return;
+    setState(() {
+      _isAddingAsset = true;
+    });
+
     final name = _nameController.text;
     final status = _selectedStatus;
 
@@ -349,6 +360,9 @@ class _AddAssetFormState extends State<AddAssetForm> {
           content: Text('Missing fields!'),
         ),
       );
+      setState(() {
+        _isAddingAsset = false;
+      });
       return;
     }
 
@@ -359,6 +373,9 @@ class _AddAssetFormState extends State<AddAssetForm> {
           content: Text('Token not found or invalid'),
         ),
       );
+      setState(() {
+        _isAddingAsset = false;
+      });
       return;
     }
 
@@ -379,8 +396,8 @@ class _AddAssetFormState extends State<AddAssetForm> {
           content: Text('Asset added successfully'),
         ),
       );
-      widget.addAsset(name, status, _imageFile!.path);
       Navigator.of(context).pop();
+      widget.onAssetAdded();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -388,6 +405,10 @@ class _AddAssetFormState extends State<AddAssetForm> {
         ),
       );
     }
+
+    setState(() {
+      _isAddingAsset = false;
+    });
   }
 
   Future<void> _pickImage() async {
