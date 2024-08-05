@@ -66,10 +66,9 @@ site varchar(50) not null,
 asset_id int not null,
 date_of_fault date not null,
 description varchar(50) not null,
-foreign key (asset_id) references asset(id),
-foreign key (client_id) references client(id)
+foreign key (asset_id) references asset(id) on delete cascade,
+foreign key (client_id) references client(id) on delete cascade
 );
-
 
 insert into administrator values(1, 'admin@discovery.com', '123');
 select * from reports;

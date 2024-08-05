@@ -233,7 +233,7 @@ Widget buildDateField( DateTime initialDate) {
                     child: Text('Submit Work Request', style: TextStyle(color: Colors.white)),
                     
                      style: ElevatedButton.styleFrom(
-                     backgroundColor: Color(0xFF00BFA5), // Teal color similar to the image
+                     backgroundColor: Colors.green, // Teal color similar to the image
                      shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0),
                      // Rounded corners

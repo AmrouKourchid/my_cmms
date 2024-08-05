@@ -160,6 +160,78 @@ class _AssetPageState extends State<AssetPage> {
     );
   }
 
+  void _showEditStatusDialog(int assetId, String currentStatus) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String _newStatus = currentStatus;
+        return AlertDialog(
+          title: const Text('Edit Asset Status'),
+          content: DropdownButton<String>(
+            value: _newStatus,
+            items: <String>['functional', 'needs checking', 'faulty']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _newStatus = newValue!;
+              });
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Update'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _updateAssetStatus(assetId, _newStatus);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateAssetStatus(int id, String status) async {
+    final token = await _storage.read(key: 'your_secret_key');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token not found or invalid')),
+      );
+      return;
+    }
+
+    final response = await http.put(
+      Uri.parse('http://localhost:5506/updateAssetStatus/$id'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'status': status}),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Asset status updated successfully')),
+      );
+      _fetchAssets(); // Refresh the asset list
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update asset status: ${response.body}')),
+      );
+    }
+  }
+
   void _showAddAssetForm() {
     showDialog(
       context: context,
@@ -204,9 +276,18 @@ class _AssetPageState extends State<AssetPage> {
                                 ),
                           title: Text(asset['name']),
                           subtitle: Text('Status: ${asset['status']}'),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _showDeleteConfirmationDialog(asset['id']),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _showDeleteConfirmationDialog(asset['id']),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _showEditStatusDialog(asset['id'], asset['status']),
+                              ),
+                            ],
                           ),
                         ),
                       );

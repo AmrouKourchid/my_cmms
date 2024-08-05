@@ -6,6 +6,7 @@ import '../utils/home/add_worker.dart';
 import '../utils/home/CreateOrder.dart';
 import '../utils/home/ViewOrder.dart';
 import '../utils/home/Asset.dart'; // Import the Asset page
+import '../utils/home/ViewRequest.dart'; // Import the View Request page
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
     'Worker List',
     'Create Work Orders',
     'View Work Orders',
-    'Assets'
+    'Assets',
+    'View Work Requests' // New tab title
   ];
 
   @override
@@ -169,6 +171,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return const AllOrders();
       case 3:
         return const AssetPage(); // Add the Asset page
+      case 4:
+        return const ViewRequest(); // New tab for View Work Requests
       default:
         return const Text("Error");
     }
@@ -283,6 +287,11 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: Icon(Icons.account_balance),
               title: const Text('Assets'),
               onTap: () => _onSelectItem(3),
+            ),
+            ListTile(
+              leading: Icon(Icons.report),
+              title: const Text('View Work Requests'),
+              onTap: () => _onSelectItem(4),
             ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
