@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({'id': id}),
+      body: jsonEncode({'id': id}),  // Ensure you are sending 'id' correctly
     );
 
     if (response.statusCode == 200) {
@@ -148,12 +148,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Usage in showDialog
   void _showRegisterForm() {
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
-          child: HomeForm(addPerson: _addWorkerName), // Updated to use the new function name
+          child: HomeForm(addWorkerName: (String name, String imagePath) {
+            _addWorkerName(name, imagePath, 'defaultRole'); // Assuming 'defaultRole' is a placeholder
+          }),
         );
       },
     );

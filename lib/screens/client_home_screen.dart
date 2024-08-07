@@ -46,8 +46,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     }
   }
 
-   Future<void> _createWorkRequest() async {
-    // Extract the payload from the JWT token
+  Future<void> _createWorkRequest() async {
     var parts = widget.token.split('.');
     if (parts.length != 3) {
       print('Invalid token');
@@ -77,13 +76,21 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Work request created successfully')),
       );
+      // Resetting the fields after successful submission
+      _siteController.clear();
+      _descriptionController.clear();
+      setState(() {
+        _selectedAsset = null; // Reset the selected asset
+        _dateOfFault = DateTime.now(); // Reset the date to current date
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to create work request: ${response.body}')),
       );
     }
   }
- Widget buildTextField(TextEditingController controller) {
+
+  Widget buildTextField(TextEditingController controller) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -92,12 +99,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
-
-Widget buildDateField( DateTime initialDate) {
+  Widget buildDateField(DateTime initialDate) {
     return TextFormField(
       controller: TextEditingController(text: DateFormat('yyyy-MM-dd').format(initialDate)),
       decoration: InputDecoration(
-  
         border: OutlineInputBorder(),
       ),
       readOnly: true,
@@ -116,6 +121,7 @@ Widget buildDateField( DateTime initialDate) {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -221,25 +227,23 @@ Widget buildDateField( DateTime initialDate) {
                   SizedBox(height: 30),
                   Text('Date of Fault', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
-                  buildDateField( _dateOfFault),
+                  buildDateField(_dateOfFault),
                   SizedBox(height: 30),
                   Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
                   buildTextField(_descriptionController),
                   SizedBox(height: 30),
                   Center(
-                  child :ElevatedButton(
-                    onPressed: _createWorkRequest,
-                    child: Text('Submit Work Request', style: TextStyle(color: Colors.white)),
-                    
-                     style: ElevatedButton.styleFrom(
-                     backgroundColor: Colors.green, // Teal color similar to the image
-                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                     // Rounded corners
+                    child: ElevatedButton(
+                      onPressed: _createWorkRequest,
+                      child: Text('Submit Work Request', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Teal color similar to the image
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                          // Rounded corners
                         ),
-                        padding: EdgeInsets.all(20), 
-                        // Padding inside the button
+                        padding: EdgeInsets.all(20), // Padding inside the button
                       ),
                     ),
                   ),

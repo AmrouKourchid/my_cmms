@@ -17,9 +17,9 @@ String? validateEmail(String? value) {
 }
 
 class HomeForm extends StatefulWidget {
-  final Function(String, String, String) addPerson;
+  final Function(String, String) addWorkerName;
 
-  const HomeForm({super.key, required this.addPerson});
+  const HomeForm({super.key, required this.addWorkerName});
 
   @override
   _HomeFormState createState() => _HomeFormState();
@@ -83,7 +83,7 @@ class _HomeFormState extends State<HomeForm> {
           content: Text('Person registered successfully'),
         ),
       );
-      widget.addPerson(name, _imageFile!.path, role);
+      widget.addWorkerName(name, _imageFile!.path);
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
