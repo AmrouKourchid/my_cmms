@@ -185,13 +185,13 @@ class _AssetPageState extends State<AssetPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Update'),
+              child: const Text('Update', style: TextStyle(color: Color(0xff009fd6))),
               onPressed: () {
                 Navigator.of(context).pop();
                 _updateAssetStatus(assetId, _newStatus);
