@@ -105,6 +105,7 @@ class _HomeFormState extends State<HomeForm> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Container(
       height: double.infinity,
       width: double.infinity,
@@ -117,7 +118,7 @@ class _HomeFormState extends State<HomeForm> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(18.0),
         child: Stack(
           children: [
             Form(

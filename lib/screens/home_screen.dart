@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedDrawerIndex = 0;
 
   final List<String> _titles = [
-    'Worker List',
+    'User List',
     'Create Work Orders',
     'View Work Orders',
     'Assets',
@@ -112,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
           content: Text('${role.toUpperCase()} deleted successfully'),
         ),
       );
+      await _fetchWorkers();  // Re-fetch workers after deletion
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -198,12 +199,12 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Worker List",
+                  "User List",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  "Below are the workers in our CMMS",
+                  "Below are the users in our CMMS",
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
@@ -280,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               leading: Icon(Icons.group),
-              title: const Text('Workers'),
+              title: const Text('Users'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
