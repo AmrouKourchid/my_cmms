@@ -46,40 +46,43 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workers'),
+      Uri.parse('http://localhost:5506/people'), // Updated endpoint
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> workers = jsonDecode(response.body);
+      final List<dynamic> people = jsonDecode(response.body);
       setState(() {
         _workers.clear();
-        _workers.addAll(workers.map((worker) => {
-              'name': worker['name'].toString(),
-              'image': worker['image']?.toString() ?? '',
+        _workers.addAll(people.map((person) => {
+              'name': person['name'].toString(),
+              'image': person['image']?.toString() ?? '',
+              'role': person['role'].toString(), // Handle role
+              'id': person['id'].toString(), // Store the id
             }));
       });
     } else {
-      print('Failed to fetch workers: ${response.statusCode}');
+      print('Failed to fetch people: ${response.statusCode}');
       print('Response body: ${response.body}');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to fetch workers'),
+          content: Text('Failed to fetch people'),
         ),
       );
     }
   }
 
-  Future<void> _addWorkerName(String name, String imagePath) async {
+  Future<void> _addWorkerName(String name, String imagePath, String role) async {
     setState(() {
-      _workers.add({'name': name, 'image': imagePath});
+      _workers.add({'name': name, 'image': imagePath, 'role': role});
     });
     await _fetchWorkers();
   }
 
-  Future<void> _deleteWorkerName(String name) async {
+  // Update the function to accept 'id' and 'role' parameters
+  Future<void> _deleteWorkerName(String id, String role) async {
     final token = await _storage.read(key: 'your_secret_key');
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -90,40 +93,42 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
+    final uri = role == 'worker' ? 'http://localhost:5506/deleteWorker' : 'http://localhost:5506/deleteClient';
     final response = await http.delete(
-      Uri.parse('http://localhost:5506/deleteWorker'),
+      Uri.parse(uri),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({'name': name}),
+      body: jsonEncode({'id': id}),
     );
 
     if (response.statusCode == 200) {
       setState(() {
-        _workers.removeWhere((worker) => worker['name'] == name);
+        _workers.removeWhere((worker) => worker['id'] == id);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Worker deleted successfully'),
+        SnackBar(
+          content: Text('${role.toUpperCase()} deleted successfully'),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to delete worker'),
+        SnackBar(
+          content: Text('Failed to delete ${role}'),
         ),
       );
     }
   }
 
-  Future<void> _confirmDeleteWorker(String name) async {
+  // Update the confirm delete function to pass the role and id
+  Future<void> _confirmDeleteWorker(String id, String role) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete User'),
-          content: const Text('Are you sure you want to delete the user?'),
+          content: const Text('Are you sure you want to delete this user?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -139,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (result == true) {
-      _deleteWorkerName(name);
+      _deleteWorkerName(id, role);
     }
   }
 
@@ -148,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) {
         return Dialog(
-          child: HomeForm(addWorkerName: _addWorkerName),
+          child: HomeForm(addPerson: _addWorkerName), // Updated to use the new function name
         );
       },
     );
@@ -178,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Update the UI to display the role
   Widget _buildWorkerList() {
     return Column(
       children: [
@@ -236,8 +242,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Icon(Icons.person),
                     ),
               title: Text(worker['name']!),
+              subtitle: Text(worker['role']!), // Display role here
               trailing: ElevatedButton(
-                onPressed: () => _confirmDeleteWorker(worker['name']!),
+                onPressed: () => _confirmDeleteWorker(worker['id']!, worker['role']!), // Pass the role and id
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                 ),

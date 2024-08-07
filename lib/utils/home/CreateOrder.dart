@@ -21,7 +21,7 @@ class _OrdersState extends State<Orders> {
   DateTime _endDate = DateTime.now();
   String? _selectedWorker;
   String? _selectedAsset;
-  List<dynamic> _workers = [];
+  List<Map<String, dynamic>> _workers = [];
   List<dynamic> _assets = [];
   List<File> _images = [];
   final _storage = const FlutterSecureStorage();
@@ -45,18 +45,27 @@ class _OrdersState extends State<Orders> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/allWorkers'),
+      Uri.parse('http://localhost:5506/getWorkers'),
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
+      final List<dynamic> workers = jsonDecode(response.body);
       setState(() {
-        _workers = json.decode(response.body);
+        _workers = workers.map((worker) => {
+          'id': worker['id'].toString(),
+          'name': worker['name'],
+          'image': worker['image'],
+        }).toList();
       });
     } else {
-      print('Failed to fetch workers');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to fetch workers: ${response.statusCode}'),
+        ),
+      );
     }
   }
 
@@ -279,7 +288,7 @@ class _OrdersState extends State<Orders> {
                     value: _selectedWorker,
                     items: _workers.map<DropdownMenuItem<String>>((worker) {
                       return DropdownMenuItem<String>(
-                        value: worker['id'].toString(),
+                        value: worker['id'], // Ensure this is a string
                         child: Row(
                           children: [
                             worker['image'] != null

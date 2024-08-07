@@ -17,9 +17,9 @@ String? validateEmail(String? value) {
 }
 
 class HomeForm extends StatefulWidget {
-  final Function(String, String) addWorkerName;
+  final Function(String, String, String) addPerson;
 
-  const HomeForm({super.key, required this.addWorkerName});
+  const HomeForm({super.key, required this.addPerson});
 
   @override
   _HomeFormState createState() => _HomeFormState();
@@ -31,13 +31,13 @@ class _HomeFormState extends State<HomeForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _ssnController = TextEditingController();
-  String _selectedRole = 'X'; // Default role
+  String _selectedRole = 'worker';
   File? _imageFile;
   bool _isPasswordVisible = false;
 
-  final _storage = const FlutterSecureStorage(); // Secure storage instance
+  final _storage = const FlutterSecureStorage();
 
-  Future<void> _registerWorker() async {
+  Future<void> _registerPerson() async {
     final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
@@ -53,7 +53,6 @@ class _HomeFormState extends State<HomeForm> {
       return;
     }
 
-    // Retrieve the token from secure storage
     final token = await _storage.read(key: 'your_secret_key');
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,7 +65,7 @@ class _HomeFormState extends State<HomeForm> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://localhost:5506/registerWorker'),
+      Uri.parse('http://localhost:5506/registerPerson'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;
@@ -81,15 +80,15 @@ class _HomeFormState extends State<HomeForm> {
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Worker registered successfully'),
+          content: Text('Person registered successfully'),
         ),
       );
-      widget.addWorkerName(name, _imageFile!.path); // Add the name and image path to the list
-      Navigator.of(context).pop(); // Close the dialog
+      widget.addPerson(name, _imageFile!.path, role);
+      Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to register worker'),
+          content: Text('Failed to register person'),
         ),
       );
     }
@@ -118,7 +117,7 @@ class _HomeFormState extends State<HomeForm> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0), // Add padding around the form
+        padding: const EdgeInsets.all(16.0),
         child: Stack(
           children: [
             Form(
@@ -129,19 +128,19 @@ class _HomeFormState extends State<HomeForm> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Register Worker",
+                      "Register Person",
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      "Fill in the details to register a new worker",
+                      "Fill in the details to register a new person",
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                     const SizedBox(height: 20),
                     const Text("Name"),
                     const SizedBox(height: 8),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width - 32, // Adjust width
+                      width: MediaQuery.of(context).size.width - 32,
                       child: TextFormField(
                         controller: _nameController,
                         style: const TextStyle(color: Colors.black),
@@ -159,7 +158,7 @@ class _HomeFormState extends State<HomeForm> {
                     const Text("Email"),
                     const SizedBox(height: 8),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width - 32, // Adjust width
+                      width: MediaQuery.of(context).size.width - 32,
                       child: TextFormField(
                         controller: _emailController,
                         validator: validateEmail,
@@ -179,7 +178,7 @@ class _HomeFormState extends State<HomeForm> {
                     const Text("Password"),
                     const SizedBox(height: 8),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width - 32, // Adjust width
+                      width: MediaQuery.of(context).size.width - 32,
                       child: TextFormField(
                         controller: _passwordController,
                         style: const TextStyle(color: Colors.black),
@@ -209,10 +208,10 @@ class _HomeFormState extends State<HomeForm> {
                     const Text("Role"),
                     const SizedBox(height: 8),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width - 32, // Adjust width
+                      width: MediaQuery.of(context).size.width - 32,
                       child: DropdownButtonFormField<String>(
                         value: _selectedRole,
-                        items: ['X', 'Y', 'Z'].map((String role) {
+                        items: ['worker', 'client'].map((String role) {
                           return DropdownMenuItem<String>(
                             value: role,
                             child: Text(role),
@@ -235,7 +234,7 @@ class _HomeFormState extends State<HomeForm> {
                     const Text("SSN"),
                     const SizedBox(height: 8),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width - 32, // Adjust width
+                      width: MediaQuery.of(context).size.width - 32,
                       child: TextFormField(
                         controller: _ssnController,
                         style: const TextStyle(color: Colors.black),
@@ -256,7 +255,7 @@ class _HomeFormState extends State<HomeForm> {
                       onTap: _pickImage,
                       child: Container(
                         height: 50,
-                        width: MediaQuery.of(context).size.width - 32, // Adjust width
+                        width: MediaQuery.of(context).size.width - 32,
                         decoration: BoxDecoration(
                           color: Colors.blue,
                           borderRadius: BorderRadius.circular(8),
@@ -277,10 +276,10 @@ class _HomeFormState extends State<HomeForm> {
                       ),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: _registerWorker,
+                      onTap: _registerPerson,
                       child: Container(
                         height: 50,
-                        width: MediaQuery.of(context).size.width - 32, // Adjust width
+                        width: MediaQuery.of(context).size.width - 32,
                         decoration: BoxDecoration(
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(8),
