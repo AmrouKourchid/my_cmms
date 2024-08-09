@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../utils/add_report.dart'; // Import the AddReport widget
 import 'dart:typed_data';
+import '../utils/add_material.dart' as material_utils;
 
 class WorkerHomeScreen extends StatefulWidget {
   final String token;
@@ -382,7 +383,18 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 await _storage.delete(key: 'your_secret_key');
                 Navigator.of(context).pushReplacementNamed('/login');
               },
+              
             ),
+            ListTile(
+  leading: const Icon(Icons.build),
+  title: const Text('Create Material'),
+  onTap: () {
+    Navigator.of(context).pop(); // Close the drawer
+   Navigator.of(context).push(MaterialPageRoute(
+  builder: (context) => const material_utils.MaterialPage(),
+));
+  },
+),
           ],
         ),
       ),
