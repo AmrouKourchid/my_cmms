@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter/material.dart';
 class ViewReport extends StatelessWidget {
   final int workOrderId;
   const ViewReport({Key? key, required this.workOrderId}) : super(key: key);
 
   Future<dynamic> fetchReport() async {
-    final storage = FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     final token = await storage.read(key: 'your_secret_key');
     final response = await http.get(
       Uri.parse('http://localhost:5506/reportByWorkOrderId/$workOrderId'),
@@ -36,7 +35,7 @@ class ViewReport extends StatelessWidget {
           final report = snapshot.data;
           return AlertDialog(
             backgroundColor: Colors.transparent,
-            title: Text('Report for Work Order ID: $workOrderId', style: Theme.of(context).textTheme.titleSmall ?? TextStyle()),
+            title: Text('Report for Work Order ID: $workOrderId', style: Theme.of(context).textTheme.titleSmall ?? const TextStyle()),
             content: SingleChildScrollView(
               child: Form(
                 child: Column(

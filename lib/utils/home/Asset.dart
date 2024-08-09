@@ -165,11 +165,11 @@ class _AssetPageState extends State<AssetPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String _newStatus = currentStatus;
+        String newStatus = currentStatus;
         return AlertDialog(
           title: const Text('Edit Asset Status'),
           content: DropdownButton<String>(
-            value: _newStatus,
+            value: newStatus,
             items: <String>['functional', 'needs checking', 'faulty']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -179,7 +179,7 @@ class _AssetPageState extends State<AssetPage> {
             }).toList(),
             onChanged: (String? newValue) {
               setState(() {
-                _newStatus = newValue!;
+                newStatus = newValue!;
               });
             },
           ),
@@ -194,7 +194,7 @@ class _AssetPageState extends State<AssetPage> {
               child: const Text('Update', style: TextStyle(color: Color(0xff009fd6))),
               onPressed: () {
                 Navigator.of(context).pop();
-                _updateAssetStatus(assetId, _newStatus);
+                _updateAssetStatus(assetId, newStatus);
               },
             ),
           ],

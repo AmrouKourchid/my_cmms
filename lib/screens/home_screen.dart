@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to delete ${role}'),
+          content: Text('Failed to delete $role'),
         ),
       );
     }
@@ -280,32 +280,32 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Admin Menu'),
             ),
             ListTile(
-              leading: Icon(Icons.group),
+              leading: const Icon(Icons.group),
               title: const Text('Users'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
-              leading: Icon(Icons.add_circle_outline),
+              leading: const Icon(Icons.add_circle_outline),
               title: const Text('Create Work Orders'),
               onTap: () => _onSelectItem(1),
             ),
             ListTile(
-              leading: Icon(Icons.view_list),
+              leading: const Icon(Icons.view_list),
               title: const Text('View Work Orders'),
               onTap: () => _onSelectItem(2),
             ),
             ListTile(
-              leading: Icon(Icons.account_balance),
+              leading: const Icon(Icons.account_balance),
               title: const Text('Assets'),
               onTap: () => _onSelectItem(3),
             ),
             ListTile(
-              leading: Icon(Icons.report),
+              leading: const Icon(Icons.report),
               title: const Text('View Work Requests'),
               onTap: () => _onSelectItem(4),
             ),
             ListTile(
-              leading: Icon(Icons.exit_to_app),
+              leading: const Icon(Icons.exit_to_app),
               title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');

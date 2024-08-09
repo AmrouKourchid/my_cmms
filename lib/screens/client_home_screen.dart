@@ -93,7 +93,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   Widget buildTextField(TextEditingController controller) {
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: OutlineInputBorder(),
       ),
     );
@@ -102,7 +102,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   Widget buildDateField(DateTime initialDate) {
     return TextFormField(
       controller: TextEditingController(text: DateFormat('yyyy-MM-dd').format(initialDate)),
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: OutlineInputBorder(),
       ),
       readOnly: true,
@@ -127,10 +127,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Client Home'),
+        title: const Text('Client Home'),
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
       ),
@@ -138,7 +138,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
+            const DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
@@ -151,16 +151,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.work),
-              title: Text('Create Work Request'),
+              leading: const Icon(Icons.work),
+              title: const Text('Create Work Request'),
               onTap: () {
                 Navigator.pop(context);
                 _createWorkRequest();
               },
             ),
             ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Logout'),
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Logout'),
               onTap: () {
                 _storage.delete(key: 'your_secret_key');
                 Navigator.pushAndRemoveUntil(
@@ -176,7 +176,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       body: Container(
         width: double.infinity,
         height: MediaQuery.of(context).size.height, // Set height to fill the screen
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,
@@ -190,8 +190,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Select Asset', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const Text('Select Asset', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     value: _selectedAsset,
                     onChanged: (String? newValue) {
@@ -206,45 +206,45 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                           children: [
                             asset['image'] != null
                                 ? Image.memory(base64Decode(asset['image']), width: 30, height: 30)
-                                : Icon(Icons.image_not_supported),
-                            SizedBox(width: 10),
+                                : const Icon(Icons.image_not_supported),
+                            const SizedBox(width: 10),
                             Text(asset['name']),
                           ],
                         ),
                       );
                     }).toList(),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Select Asset',
                       border: OutlineInputBorder(),
                       filled: true,
                       fillColor: Colors.transparent,
                     ),
                   ),
-                  SizedBox(height: 30),
-                  Text('Site Location', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 30),
+                  const Text('Site Location', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   buildTextField(_siteController),
-                  SizedBox(height: 30),
-                  Text('Date of Fault', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 30),
+                  const Text('Date of Fault', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   buildDateField(_dateOfFault),
-                  SizedBox(height: 30),
-                  Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 30),
+                  const Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   buildTextField(_descriptionController),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Center(
                     child: ElevatedButton(
                       onPressed: _createWorkRequest,
-                      child: Text('Submit Work Request', style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green, // Teal color similar to the image
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4.0),
                           // Rounded corners
                         ),
-                        padding: EdgeInsets.all(20), // Padding inside the button
+                        padding: const EdgeInsets.all(20), // Padding inside the button
                       ),
+                      child: const Text('Submit Work Request', style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],

@@ -141,11 +141,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             elevation: 5.0,
             backgroundColor: Colors.transparent,
             child: Container(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               width: MediaQuery.of(context).size.width * 0.9,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20.0),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [Colors.white, Color(0xff009fd6)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -155,7 +155,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order['name'], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(order['name'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     Text('Status: ${order['status']}'),
                     Text('Description: ${order['description']}'),
                     Text('Start Date: ${order['start_date']}'),
@@ -182,7 +182,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                           }
                         }).toList(),
                       ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -371,12 +371,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.view_list),
+              leading: const Icon(Icons.view_list),
               title: const Text('Work Orders'),
               onTap: () => _onSelectItem(0),
             ),
             ListTile(
-              leading: Icon(Icons.exit_to_app),
+              leading: const Icon(Icons.exit_to_app),
               title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');

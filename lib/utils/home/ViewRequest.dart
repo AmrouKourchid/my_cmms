@@ -101,7 +101,7 @@ class _ViewRequestState extends State<ViewRequest> {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.delete),
+          icon: const Icon(Icons.delete),
           onPressed: () => _deleteRequest(request['id']),
         ),
       ),
@@ -113,8 +113,8 @@ class _ViewRequestState extends State<ViewRequest> {
     return Scaffold(
       body: Container(
          width: MediaQuery.of(context).size.width,
-         padding: EdgeInsets.all(20.0),
-        decoration: BoxDecoration(
+         padding: const EdgeInsets.all(20.0),
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,

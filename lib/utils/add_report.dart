@@ -74,13 +74,11 @@ class _AddReportState extends State<AddReport> {
 
   Future<void> _pickImages() async {
     final ImagePicker picker = ImagePicker();
-    final List<XFile>? pickedFiles = await picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _pictures.addAll(pickedFiles);
-      });
+    final List<XFile> pickedFiles = await picker.pickMultiImage();
+    setState(() {
+      _pictures.addAll(pickedFiles);
+    });
     }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +92,7 @@ class _AddReportState extends State<AddReport> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Work Order:'),
-              Text('${widget.workOrderId}', style: TextStyle(fontSize: 16)),
+              Text('${widget.workOrderId}', style: const TextStyle(fontSize: 16)),
               const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -110,11 +108,11 @@ class _AddReportState extends State<AddReport> {
                           radius: 15,
                         )
                       : const CircleAvatar(
-                          child: Icon(Icons.person, size: 30),
                           radius: 30,
+                          child: Icon(Icons.person, size: 30),
                         ),
                     const SizedBox(width: 8),
-                    Text(widget.workerName, style: TextStyle(fontSize: 20)),
+                    Text(widget.workerName, style: const TextStyle(fontSize: 20)),
                   ],
                 ),
               ),

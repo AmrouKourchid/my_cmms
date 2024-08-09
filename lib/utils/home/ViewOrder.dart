@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:ui'; // Import dart:ui to use ImageFilter
+// Import dart:ui to use ImageFilter
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
@@ -116,11 +116,11 @@ class _AllOrdersState extends State<AllOrders> {
             elevation: 5.0, // Adds shadow under the dialog
             backgroundColor: Colors.transparent, // Make dialog background transparent
             child: Container(
-              padding: EdgeInsets.all(20.0), // Padding inside the dialog
+              padding: const EdgeInsets.all(20.0), // Padding inside the dialog
               width: MediaQuery.of(context).size.width * 0.9, // Dialog width is 90% of screen width
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20.0), // Match dialog rounded corners
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [Colors.white, Color(0xff009fd6)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -130,7 +130,7 @@ class _AllOrdersState extends State<AllOrders> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order['name'], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(order['name'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     Text('Status: ${order['status']}'),
                     Text('Description: ${order['description']}'),
                     Text('Start Date: ${order['start_date']}'),
@@ -157,12 +157,12 @@ class _AllOrdersState extends State<AllOrders> {
                           }
                         }).toList(),
                       ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text('Close', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: const Text('Close', style: TextStyle(fontSize: 16, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -201,7 +201,7 @@ class _AllOrdersState extends State<AllOrders> {
                 Text('End Date: ${order['end_date']}'),
                 Text('Assigned to: ${order['assigned_to']}'),
                 Text('Asset: ${order['asset_name']}'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -209,11 +209,11 @@ class _AllOrdersState extends State<AllOrders> {
                       onPressed: () => _showDetailsDialog(order['id']),
                       child: const Text('Details', style: TextStyle(color: Color(0xff009fd6))),
                     ),
-                    SizedBox(width: 8), // Space between buttons
+                    const SizedBox(width: 8), // Space between buttons
                     if (order['status'] == 'closed')
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xff009fd6),
+                          backgroundColor: const Color(0xff009fd6),
                         ),
                         onPressed: () {
                           showDialog(
@@ -237,7 +237,7 @@ class _AllOrdersState extends State<AllOrders> {
               right: 0,
               top: 0,
               child: IconButton(
-                icon: Icon(Icons.close), // Using 'close' icon which looks like an 'X'
+                icon: const Icon(Icons.close), // Using 'close' icon which looks like an 'X'
                 onPressed: () => _confirmDelete(order['id']),
               ),
             ),
@@ -252,16 +252,16 @@ class _AllOrdersState extends State<AllOrders> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete this work order?'),
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this work order?'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Delete'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -287,11 +287,11 @@ class _AllOrdersState extends State<AllOrders> {
         _allOrders.removeWhere((order) => order['id'] == id);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Work order deleted successfully')),
+        const SnackBar(content: Text('Work order deleted successfully')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete work order')),
+        const SnackBar(content: Text('Failed to delete work order')),
       );
     }
   }
@@ -385,7 +385,7 @@ class _ViewReportState extends State<ViewReport> {
         controller: TextEditingController(text: value ?? 'Not available'), // Use a fallback value if null
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
         readOnly: true,
       ),
@@ -422,11 +422,11 @@ class _ViewReportState extends State<ViewReport> {
       elevation: 5.0,
       backgroundColor: Colors.transparent,
       child: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -437,8 +437,8 @@ class _ViewReportState extends State<ViewReport> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Report for Work Order ${widget.workOrderId}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
+              Text('Report for Work Order ${widget.workOrderId}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
               _buildReadOnlyTextField('Worker', _report['worker_name']),
               _buildReadOnlyTextField('Question 1', _report['question1']),
               _buildReadOnlyTextField('Question 2', _report['question2']),
@@ -466,12 +466,12 @@ class _ViewReportState extends State<ViewReport> {
                     }
                   }).toList(),
                 ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Close', style: TextStyle(fontSize: 16, color: Colors.white)),
+                  child: const Text('Close', style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
               ),
             ],

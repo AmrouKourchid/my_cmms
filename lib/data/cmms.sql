@@ -73,4 +73,14 @@ foreign key (asset_id) references asset(id) on delete cascade,
 foreign key (client_id) references client(id) on delete cascade
 );
 
+
+CREATE TABLE material (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  worker_id int not null,
+  name VARCHAR(100) NOT NULL,
+  cost varchar(100) not null,
+  image LONGBLOB,
+  foreign key(worker_id) references worker(id) on delete cascade
+);
+
 insert into administrator values(1, 'admin@discovery.com', '123');
