@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../utils/add_material.dart' as material_utils; // Adjusted import
+import '../utils/add_report.dart'; // Import the AddReport widget
+import 'dart:typed_data';
+import '../utils/add_material.dart' as material_utils;
 
 class WorkerHomeScreen extends StatefulWidget {
   final String token;
@@ -19,7 +21,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   List<dynamic> _workerOrders = [];
   final _storage = const FlutterSecureStorage();
   int _selectedDrawerIndex = 0;
-  String? _workerName; 
+  String? _workerName;
   String? _workerImage;
   int? _workerId;
 
@@ -67,18 +69,188 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     }
   }
 
+  void _updateWorkOrderStatus(int id, String status) async {
+    final response = await http.put(
+      Uri.parse('http://localhost:5506/updateWorkOrderStatus/$id'),
+      headers: {
+        'Authorization': 'Bearer ${widget.token}',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'status': status}),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Work order status updated to $status')),
+      );
+      _fetchWorkerOrders();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update work order status')),
+      );
+    }
+  }
+
+  void _showImageDialog(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 500,
+            height: 500,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: MemoryImage(imageData),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDetailsDialog(int id) async {
+    final token = await _storage.read(key: 'your_secret_key');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Token not found or invalid'),
+        ),
+      );
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse('http://localhost:5506/workOrder/$id'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final order = json.decode(response.body);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            elevation: 5.0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(20.0),
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                gradient: const LinearGradient(
+                  colors: [Colors.white, Color(0xff009fd6)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(order['name'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text('Status: ${order['status']}'),
+                    Text('Description: ${order['description']}'),
+                    Text('Start Date: ${order['start_date']}'),
+                    Text('End Date: ${order['end_date']}'),
+                    Text('Assigned to: ${order['assigned_to']}'),
+                    Text('Asset: ${order['asset_name']}'),
+                    if (order['images'] != null && order['images'].isNotEmpty)
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: (order['images'] as List<dynamic>).map((image) {
+                          if (image != null) {
+                            final imageData = base64Decode(image);
+                            return GestureDetector(
+                              onTap: () => _showImageDialog(imageData),
+                              child: Image.memory(
+                                imageData,
+                                height: 100,
+                                width: 100,
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        }).toList(),
+                      ),
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Close'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load work order details'),
+        ),
+      );
+    }
+  }
+
+  // ... remaining methods and build method ...
+
+
+  Future<void> _showReportDialog(int workOrderId) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AddReport(
+          workOrderId: workOrderId,
+          workerId: _workerId ?? 0, // Pass the workerId
+          workerName: _workerName ?? 'Worker',
+          workerImage: _workerImage ?? '',
+        );
+      },
+    );
+
+    if (result == true) {
+      _fetchWorkerOrders(); // Refresh the list if the report was submitted
+    }
+  }
+
+  void _previousDay() {
+    setState(() {
+      _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+    });
+  }
+
+  void _nextDay() {
+    setState(() {
+      _selectedDate = _selectedDate.add(const Duration(days: 1));
+    });
+  }
+
   void _onSelectItem(int index) {
     setState(() {
       _selectedDrawerIndex = index;
     });
+    Navigator.of(context).pop(); // close the drawer
   }
 
   Widget _getDrawerItemWidget(int pos) {
     switch (pos) {
       case 0:
         return _buildWorkOrders();
-      case 1:
-        return material_utils.MaterialPage(token: widget.token); // Pass token to MaterialPage
       default:
         return const Text("Error");
     }
@@ -86,6 +258,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   Widget _buildWorkOrders() {
     String formattedDate = DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate);
+
     List<dynamic> ordersForSelectedDate = _workerOrders.where((order) {
       DateTime startDate = DateTime.parse(order['start_date']);
       DateTime endDate = DateTime.parse(order['end_date']);
@@ -103,11 +276,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_left),
-                onPressed: () {
-                  setState(() {
-                    _selectedDate = _selectedDate.subtract(const Duration(days: 1));
-                  });
-                },
+                onPressed: _previousDay,
               ),
               Text(
                 formattedDate,
@@ -115,11 +284,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_right),
-                onPressed: () {
-                  setState(() {
-                    _selectedDate = _selectedDate.add(const Duration(days: 1));
-                  });
-                },
+                onPressed: _nextDay,
               ),
             ],
           ),
@@ -148,15 +313,17 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                               backgroundColor: Colors.green,
                             ),
                             onPressed: () {
-                              // Update work order status
+                              if (order['status'] == 'open') {
+                                _updateWorkOrderStatus(order['id'], 'in progress');
+                              } else {
+                                _showReportDialog(order['id']);
+                              }
                             },
                             child: Text(order['status'] == 'open' ? 'Start Working' : 'Finish Working', style: const TextStyle(color: Colors.white)),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 8), // Add some space between the buttons
                           ElevatedButton(
-                            onPressed: () {
-                              // Show details dialog
-                            },
+                            onPressed: () => _showDetailsDialog(order['id']),
                             child: const Text('Details'),
                           ),
                         ],
@@ -200,23 +367,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                   Text(
                     'Welcome back, ${_workerName ?? 'Worker'}',
                     style: const TextStyle(color: Colors.white, fontSize: 16),
-
                   ),
                 ],
               ),
-              
             ),
             ListTile(
               leading: const Icon(Icons.view_list),
               title: const Text('Work Orders'),
-              onTap: () => {_onSelectItem(0), Navigator.of(context).pop()},
-              
-            ),
-            ListTile(
-              leading: const Icon(Icons.home_work),
-              title: const Text('Materials'),
-              
-              onTap: () =>  {_onSelectItem(1), Navigator.of(context).pop()},
+              onTap: () => _onSelectItem(0),
             ),
             ListTile(
               leading: const Icon(Icons.exit_to_app),
@@ -225,7 +383,18 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 await _storage.delete(key: 'your_secret_key');
                 Navigator.of(context).pushReplacementNamed('/login');
               },
+              
             ),
+            ListTile(
+  leading: const Icon(Icons.build),
+  title: const Text('Create Material'),
+  onTap: () {
+    Navigator.of(context).pop(); // Close the drawer
+   Navigator.of(context).push(MaterialPageRoute(
+  builder: (context) => const material_utils.MaterialPage(),
+));
+  },
+),
           ],
         ),
       ),

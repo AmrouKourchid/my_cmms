@@ -4,11 +4,8 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-
 class MaterialPage extends StatefulWidget {
-  final String token;
-
-  const MaterialPage({super.key, required this.token});
+  const MaterialPage({super.key});
 
   @override
   _MaterialPageState createState() => _MaterialPageState();
@@ -18,19 +15,16 @@ class _MaterialPageState extends State<MaterialPage> {
   List<dynamic> _materials = [];
   final _storage = const FlutterSecureStorage();
   bool _isAddingMaterial = false;
-  String? _workerName;
-  String? _workerImage;
 
   @override
   void initState() {
     super.initState();
     _fetchMaterials();
-    _fetchWorkerDetails();
   }
 
   Future<void> _fetchMaterials() async {
-    final token = widget.token;
-    if (token.isEmpty) {
+    final token = await _storage.read(key: 'your_secret_key');
+    if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Token not found or invalid'),
@@ -60,136 +54,22 @@ class _MaterialPageState extends State<MaterialPage> {
     }
   }
 
-  Future<void> _fetchWorkerDetails() async {
-    final token = widget.token;
-    if (token.isEmpty) {
-      return;
-    }
+  Future<void> _addMaterial(String name, String cost, String imagePath) async {
+    if (_isAddingMaterial) return;
+    setState(() {
+      _isAddingMaterial = true;
+    });
 
-    final response = await http.get(
-      Uri.parse('http://localhost:5506/workerDetails'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        _workerName = data['name'];
-        _workerImage = data['image'];
-      });
-    } else {
-      print('Failed to load worker details');
-    }
-  }
-
-  void _showCreateMaterialDialog() {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController costController = TextEditingController();
-    File? imageFile;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Create Material', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const Text("Fill in the details to add a new material", style: TextStyle(fontSize: 16, color: Colors.grey)),
-                const SizedBox(height: 20),
-                const Text("Name"),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Material Name',
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text("Cost"),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: costController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    hintText: 'Material Cost',
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text("Image"),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () async {
-                    final picker = ImagePicker();
-                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      imageFile = File(pickedFile.path);
-                      setState(() {}); // Refresh the UI to show the image
-                    }
-                  },
-                  child: Container(
-                    height: 50,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text("Upload Image", style: TextStyle(color: Colors.white, fontSize: 16)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                if (imageFile != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Image.file(
-                      imageFile!,
-                      height: 100,
-                      width: 100,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Create'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                _createMaterial(nameController.text, costController.text, imageFile);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _createMaterial(String name, String cost, File? imageFile) async {
     final token = await _storage.read(key: 'your_secret_key');
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token not found or invalid')),
+        const SnackBar(
+          content: Text('Token not found or invalid'),
+        ),
       );
+      setState(() {
+        _isAddingMaterial = false;
+      });
       return;
     }
 
@@ -200,24 +80,42 @@ class _MaterialPageState extends State<MaterialPage> {
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;
     request.fields['cost'] = cost;
-
-    // Check if imageFile is not null before adding it to the request
-    if (imageFile != null) {
-      request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
-    }
+    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
 
     final response = await request.send();
+
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Material created successfully')),
+        const SnackBar(
+          content: Text('Material added successfully'),
+        ),
       );
-      // Optionally refresh the list of materials
-      _fetchMaterials();
+      _fetchMaterials(); // Refresh the material list
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create material: ${response.reasonPhrase}')),
+        const SnackBar(
+          content: Text('Failed to add material'),
+        ),
       );
     }
+
+    setState(() {
+      _isAddingMaterial = false;
+    });
+  }
+
+  void _showAddMaterialForm() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: AddMaterialForm(
+            addMaterial: _addMaterial,
+            onMaterialAdded: _fetchMaterials,
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -251,10 +149,6 @@ class _MaterialPageState extends State<MaterialPage> {
                                 ),
                           title: Text(material['name']),
                           subtitle: Text('Cost: ${material['cost']}'),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _deleteMaterial(material['id']),
-                          ),
                         ),
                       );
                     }).toList(),
@@ -268,7 +162,7 @@ class _MaterialPageState extends State<MaterialPage> {
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: ElevatedButton(
-                onPressed: _showCreateMaterialDialog,
+                onPressed: _isAddingMaterial ? null : _showAddMaterialForm,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -284,34 +178,221 @@ class _MaterialPageState extends State<MaterialPage> {
       ),
     );
   }
+}
 
-  Future<void> _deleteMaterial(int id) async {
-    final token = await _storage.read(key: 'your_secret_key');
-    if (token == null || token.isEmpty) {
+class AddMaterialForm extends StatefulWidget {
+  final Function(String, String, String) addMaterial;
+  final VoidCallback onMaterialAdded;
+
+  const AddMaterialForm({super.key, required this.addMaterial, required this.onMaterialAdded});
+
+  @override
+  _AddMaterialFormState createState() => _AddMaterialFormState();
+}
+
+class _AddMaterialFormState extends State<AddMaterialForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _costController = TextEditingController();
+  File? _imageFile;
+  bool _isAddingMaterial = false;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage(); // Define _storage here
+
+  Future<void> _addMaterial() async {
+    if (_isAddingMaterial) return;
+    setState(() {
+      _isAddingMaterial = true;
+    });
+
+    final name = _nameController.text;
+    final cost = _costController.text;
+
+    if (name.isEmpty || cost.isEmpty || _imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token not found or invalid')),
+        const SnackBar(
+          content: Text('Missing fields!'),
+        ),
       );
+      setState(() {
+        _isAddingMaterial = false;
+      });
       return;
     }
 
-    final response = await http.delete(
-      Uri.parse('http://localhost:5506/deleteMaterial/$id'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
+    final token = await _storage.read(key: 'your_secret_key');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Token not found or invalid'),
+        ),
+      );
+      setState(() {
+        _isAddingMaterial = false;
+      });
+      return;
+    }
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('http://localhost:5506/createMaterial'),
     );
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields['name'] = name;
+    request.fields['cost'] = cost;
+    request.files.add(await http.MultipartFile.fromPath('image', _imageFile!.path));
+
+    final response = await request.send();
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Material deleted successfully')),
+        const SnackBar(
+          content: Text('Material added successfully'),
+        ),
       );
-      setState(() {
-        _materials.removeWhere((material) => material['id'] == id);
-      });
+      Navigator.of(context).pop();
+      widget.onMaterialAdded();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete material: ${response.body}')),
+        const SnackBar(
+          content: Text('Failed to add material'),
+        ),
       );
     }
+
+    setState(() {
+      _isAddingMaterial = false;
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: double.infinity,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Add Material",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Fill in the details to add a new material",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Name"),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 32,
+                      child: TextFormField(
+                        controller: _nameController,
+                        style: const TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                          hintText: 'Material Name',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Cost"),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 32,
+                      child: TextFormField(
+                        controller: _costController,
+                        style: const TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                          hintText: 'Material Cost',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Image"),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        height: 50,
+                        width: MediaQuery.of(context).size.width - 32,
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text("Upload Image", style: TextStyle(color: Colors.white, fontSize: 16)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (_imageFile != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Image.file(
+                          _imageFile!,
+                          height: 100,
+                          width: 100,
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: _addMaterial,
+                      child: Container(
+                        height: 50,
+                        width: MediaQuery.of(context).size.width - 32,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text("Add Material", style: TextStyle(color: Colors.white, fontSize: 16)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
