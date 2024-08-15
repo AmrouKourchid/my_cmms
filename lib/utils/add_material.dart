@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+
 class MaterialPage extends StatefulWidget {
   const MaterialPage({super.key});
 
@@ -104,6 +105,40 @@ class _MaterialPageState extends State<MaterialPage> {
     });
   }
 
+  Future<void> _deleteMaterial(int id) async {
+    final token = await _storage.read(key: 'your_secret_key');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Token not found or invalid'),
+        ),
+      );
+      return;
+    }
+
+    final response = await http.delete(
+      Uri.parse('http://localhost:5506/deleteMaterial/$id'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Material deleted successfully'),
+        ),
+      );
+      _fetchMaterials(); // Refresh the material list
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete material'),
+        ),
+      );
+    }
+  }
+
   void _showAddMaterialForm() {
     showDialog(
       context: context,
@@ -113,6 +148,33 @@ class _MaterialPageState extends State<MaterialPage> {
             addMaterial: _addMaterial,
             onMaterialAdded: _fetchMaterials,
           ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(int id) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Material'),
+          content: const Text('Are you sure you want to delete this material?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteMaterial(id);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
         );
       },
     );
@@ -149,6 +211,10 @@ class _MaterialPageState extends State<MaterialPage> {
                                 ),
                           title: Text(material['name']),
                           subtitle: Text('Cost: ${material['cost']}'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () => _showDeleteConfirmationDialog(material['id']),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -197,6 +263,7 @@ class _AddMaterialFormState extends State<AddMaterialForm> {
   File? _imageFile;
   bool _isAddingMaterial = false;
   final FlutterSecureStorage _storage = const FlutterSecureStorage(); // Define _storage here
+  String _selectedCurrency = '\$'; // Default currency
 
   Future<void> _addMaterial() async {
     if (_isAddingMaterial) return;
@@ -238,7 +305,7 @@ class _AddMaterialFormState extends State<AddMaterialForm> {
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;
-    request.fields['cost'] = cost;
+    request.fields['cost'] = '$_selectedCurrency$cost'; // Format cost with selected currency
     request.files.add(await http.MultipartFile.fromPath('image', _imageFile!.path));
 
     final response = await request.send();
@@ -323,17 +390,48 @@ class _AddMaterialFormState extends State<AddMaterialForm> {
                     const SizedBox(height: 8),
                     SizedBox(
                       width: MediaQuery.of(context).size.width - 32,
-                      child: TextFormField(
-                        controller: _costController,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                          hintText: 'Material Cost',
-                          hintStyle: const TextStyle(color: Colors.grey),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Stack(
+                        children: [
+                          TextFormField(
+                            controller: _costController,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              hintText: 'Material Cost',
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            ),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        ),
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            child: DropdownButton<String>(
+                              value: _selectedCurrency,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: '\$',
+                                  child: Text('\$'),
+                                ),
+                                DropdownMenuItem(
+                                  value: '€',
+                                  child: Text('€'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'TND',
+                                  child: Text('TND'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCurrency = value!;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),

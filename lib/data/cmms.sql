@@ -51,6 +51,7 @@ create table reports(
   id INT AUTO_INCREMENT PRIMARY KEY,
   worker_id INT NOT NULL,
   work_order_id int not null,
+  
   Question1 VARCHAR(50) NOT NULL,
   Question2 VARCHAR(50) NOT NULL,
   Question3 VARCHAR(50) NOT NULL,
@@ -82,5 +83,12 @@ CREATE TABLE material (
   image LONGBLOB,
   foreign key(worker_id) references worker(id) on delete cascade
 );
-
+CREATE TABLE report_material (
+  report_id INT NOT NULL,
+  material_id INT NOT NULL,
+  PRIMARY KEY (report_id, material_id),
+  FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
+  FOREIGN KEY (material_id) REFERENCES material(id) ON DELETE CASCADE
+);
 insert into administrator values(1, 'admin@discovery.com', '123');
+select * from material;

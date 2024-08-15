@@ -20,10 +20,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   DateTime _selectedDate = DateTime.now();
   List<dynamic> _workerOrders = [];
   final _storage = const FlutterSecureStorage();
-  int _selectedDrawerIndex = 0;
   String? _workerName;
   String? _workerImage;
   int? _workerId;
+  final PageController _pageController = PageController();
+  int _selectedDrawerIndex = 0;
 
   @override
   void initState() {
@@ -207,9 +208,6 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     }
   }
 
-  // ... remaining methods and build method ...
-
-
   Future<void> _showReportDialog(int workOrderId) async {
     final result = await showDialog<bool>(
       context: context,
@@ -251,6 +249,8 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     switch (pos) {
       case 0:
         return _buildWorkOrders();
+      case 1:
+        return const material_utils.MaterialPage();
       default:
         return const Text("Error");
     }
@@ -383,34 +383,30 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 await _storage.delete(key: 'your_secret_key');
                 Navigator.of(context).pushReplacementNamed('/login');
               },
-              
             ),
             ListTile(
-  leading: const Icon(Icons.build),
-  title: const Text('Create Material'),
-  onTap: () {
-    Navigator.of(context).pop(); // Close the drawer
-   Navigator.of(context).push(MaterialPageRoute(
-  builder: (context) => const material_utils.MaterialPage(),
-));
-  },
-),
+              leading: const Icon(Icons.build),
+              title: const Text('Create Material'),
+              onTap: () => _onSelectItem(1),
+            ),
           ],
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
+      body: Container (
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _getDrawerItemWidget(_selectedDrawerIndex),
-        ),
+        child: PageView(
+        controller: _pageController,
+        children: [
+          _getDrawerItemWidget(_selectedDrawerIndex),
+        ],
       ),
+    ),
     );
   }
 }
