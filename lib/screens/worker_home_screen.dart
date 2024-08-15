@@ -189,7 +189,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Close'),
+                        child: const Text('Close', style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   ],
@@ -324,7 +324,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                           const SizedBox(width: 8), // Add some space between the buttons
                           ElevatedButton(
                             onPressed: () => _showDetailsDialog(order['id']),
-                            child: const Text('Details'),
+                            child: const Text('Details', style: TextStyle(color: Color(0xff009fd6)),),
                           ),
                         ],
                       ),
@@ -376,18 +376,19 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               title: const Text('Work Orders'),
               onTap: () => _onSelectItem(0),
             ),
+           
             ListTile(
+              leading: const Icon(Icons.build),
+              title: const Text('Create Material'),
+              onTap: () => _onSelectItem(1),
+            ),
+             ListTile(
               leading: const Icon(Icons.exit_to_app),
               title: const Text('Logout'),
               onTap: () async {
                 await _storage.delete(key: 'your_secret_key');
                 Navigator.of(context).pushReplacementNamed('/login');
               },
-            ),
-            ListTile(
-              leading: const Icon(Icons.build),
-              title: const Text('Create Material'),
-              onTap: () => _onSelectItem(1),
             ),
           ],
         ),

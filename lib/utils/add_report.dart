@@ -225,21 +225,27 @@ class _AddReportState extends State<AddReport> {
                                 content: SingleChildScrollView(
                                   child: Column(
                                     children: _materials.map((material) {
-                                      return ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundImage: material['image'] != null
-                                              ? MemoryImage(base64Decode(material['image']))
-                                              : null,
-                                          child: material['image'] == null ? const Icon(Icons.image) : null,
-                                        ),
-                                        title: Text(material['name']),
-                                        subtitle: Text(material['cost']),
-                                        trailing: Checkbox(
-                                          value: _selectedMaterials.contains(material),
-                                          onChanged: (bool? value) {
-                                            _selectMaterial(material);
-                                          },
-                                        ),
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context, StateSetter setState) {
+                                          return ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundImage: material['image'] != null
+                                                  ? MemoryImage(base64Decode(material['image']))
+                                                  : null,
+                                              child: material['image'] == null ? const Icon(Icons.image) : null,
+                                            ),
+                                            title: Text(material['name']),
+                                            subtitle: Text(material['cost']),
+                                            trailing: Checkbox(
+                                              value: _selectedMaterials.contains(material),
+                                              onChanged: (bool? value) {
+                                                setState(() {
+                                                  _selectMaterial(material);
+                                                });
+                                              },
+                                            ),
+                                          );
+                                        },
                                       );
                                     }).toList(),
                                   ),
