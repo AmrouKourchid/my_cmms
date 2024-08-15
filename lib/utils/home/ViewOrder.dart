@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-// Import dart:ui to use ImageFilter
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
-
 
 
 Future<void> saveImage(Uint8List imageData, String imageName) async {
@@ -447,6 +445,9 @@ class _ViewReportState extends State<ViewReport> {
               _buildReadOnlyTextField('Question 4', _report['question4']),
               _buildReadOnlyTextField('Question 5', _report['question5']),
               _buildReadOnlyTextField('Question 6', _report['question6']),
+              
+              const Text("Pictures"),
+              const SizedBox( height: 8),
               if (_report['pictures'] != null && (_report['pictures'] as List<dynamic>).isNotEmpty)
                 Wrap(
                   spacing: 8.0,
@@ -468,28 +469,39 @@ class _ViewReportState extends State<ViewReport> {
                   }).toList(),
                 ),
               const SizedBox(height: 20),
+              const Text("Materials Used:"),
+              const SizedBox( height: 8),
               if (_report['materials'] != null && (_report['materials'] as List<dynamic>).isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Materials Used', style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    ...(_report['materials'] as List<dynamic>).map((material) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: Row(
-                          children: [
-                            if (material['image'] != null && material['image'].isNotEmpty)
-                              Image.memory(base64Decode(material['image']), height: 50, width: 50),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text('${material['name']} - ${material['cost']}'),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: (_report['materials'] as List<dynamic>).map((material) {
+                    return Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (material['image'] != null && material['image'].isNotEmpty)
+                            CircleAvatar(
+                              backgroundImage: MemoryImage(base64Decode(material['image'])),
+                              radius: 20,
                             ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ],
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(material['name']),
+                              Text(material['cost'], style: const TextStyle( fontSize: 12)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
               const SizedBox(height: 20),
               Align(
