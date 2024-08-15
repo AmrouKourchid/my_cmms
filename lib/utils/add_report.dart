@@ -29,7 +29,7 @@ class _AddReportState extends State<AddReport> {
   final List<XFile> _pictures = [];
   final _questions = List<String>.filled(6, '');
   List<dynamic> _materials = [];
-  List<dynamic> _selectedMaterials = [];
+  final List<dynamic> _selectedMaterials = [];
 
   @override
   void initState() {
@@ -132,7 +132,7 @@ class _AddReportState extends State<AddReport> {
       builder: (context) {
         return Dialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.9, // Set the width to 90% of the screen
             child: SingleChildScrollView(
               child: Padding(

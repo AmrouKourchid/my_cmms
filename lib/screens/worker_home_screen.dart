@@ -393,7 +393,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         ),
       ),
       body: Container (
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.white, Color(0xff009fd6)],
             begin: Alignment.topCenter,

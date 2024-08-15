@@ -326,6 +326,7 @@ class _AllOrdersState extends State<AllOrders> {
   }
 }
 
+
 class ViewReport extends StatefulWidget {
   const ViewReport({super.key, required this.workOrderId});
 
@@ -465,6 +466,30 @@ class _ViewReportState extends State<ViewReport> {
                       return Container(); // Handle invalid base64 strings gracefully
                     }
                   }).toList(),
+                ),
+              const SizedBox(height: 20),
+              if (_report['materials'] != null && (_report['materials'] as List<dynamic>).isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Materials Used', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    ...(_report['materials'] as List<dynamic>).map((material) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5.0),
+                        child: Row(
+                          children: [
+                            if (material['image'] != null && material['image'].isNotEmpty)
+                              Image.memory(base64Decode(material['image']), height: 50, width: 50),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text('${material['name']} - ${material['cost']}'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
                 ),
               const SizedBox(height: 20),
               Align(
