@@ -49,7 +49,7 @@ class _AddReportState extends State<AddReport> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/displayMaterials'),
+      Uri.parse('http:// 192.168.2.138:5506/displayMaterials'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -78,7 +78,7 @@ class _AddReportState extends State<AddReport> {
         return;
       }
 
-      final request = http.MultipartRequest('POST', Uri.parse('http://localhost:5506/createReport'));
+      final request = http.MultipartRequest('POST', Uri.parse('http:// 192.168.2.138:5506/createReport'));
       request.headers['Authorization'] = 'Bearer $token';
       request.fields['worker_id'] = widget.workerId.toString();
       request.fields['work_order_id'] = widget.workOrderId.toString();

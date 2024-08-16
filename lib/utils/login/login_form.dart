@@ -36,7 +36,7 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     final response = await http.post(
-      Uri.parse('http://localhost:5506/login'),
+      Uri.parse('http:// 192.168.2.138:5506/login'),
       headers: {
         'Content-Type': 'application/json',
       },

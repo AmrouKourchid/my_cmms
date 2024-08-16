@@ -33,7 +33,7 @@ class _ViewRequestState extends State<ViewRequest> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workRequests'),
+      Uri.parse('http:// 192.168.2.138:5506/workRequests'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -60,7 +60,7 @@ class _ViewRequestState extends State<ViewRequest> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://localhost:5506/deleteWorkRequest/$id'),
+      Uri.parse('http:// 192.168.2.138:5506/deleteWorkRequest/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },

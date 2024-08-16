@@ -35,7 +35,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _fetchWorkerOrders() async {
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workerOrders'),
+      Uri.parse('http:// 192.168.2.138:5506/workerOrders'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
       },
@@ -52,7 +52,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _fetchWorkerDetails() async {
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workerDetails'),
+      Uri.parse('http:// 192.168.2.138:5506/workerDetails'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
       },
@@ -72,7 +72,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _updateWorkOrderStatus(int id, String status) async {
     final response = await http.put(
-      Uri.parse('http://localhost:5506/updateWorkOrderStatus/$id'),
+      Uri.parse('http:// 192.168.2.138:5506/updateWorkOrderStatus/$id'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
         'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workOrder/$id'),
+      Uri.parse('http:// 192.168.2.138:5506/workOrder/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },

@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/people'), // Updated endpoint
+      Uri.parse('http:// 192.168.2.138:5506/people'), // Updated endpoint
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    final uri = role == 'worker' ? 'http://localhost:5506/deleteWorker' : 'http://localhost:5506/deleteClient';
+    final uri = role == 'worker' ? 'http:// 192.168.2.138:5506/deleteWorker' : 'http:// 192.168.2.138:5506/deleteClient';
     final response = await http.delete(
       Uri.parse(uri),
       headers: {

@@ -47,7 +47,7 @@ class _AllOrdersState extends State<AllOrders> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/allWorkOrders'),
+      Uri.parse('http:// 192.168.2.138:5506/allWorkOrders'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -95,7 +95,7 @@ class _AllOrdersState extends State<AllOrders> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/workOrder/$id'),
+      Uri.parse('http:// 192.168.2.138:5506/workOrder/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -274,7 +274,7 @@ class _AllOrdersState extends State<AllOrders> {
   void _deleteWorkOrder(int id) async {
     final token = await _storage.read(key: 'your_secret_key');
     final response = await http.delete(
-      Uri.parse('http://localhost:5506/deleteWorkOrder/$id'),
+      Uri.parse('http:// 192.168.2.138:5506/deleteWorkOrder/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -358,7 +358,7 @@ class _ViewReportState extends State<ViewReport> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/reportByWorkOrderId/${widget.workOrderId}'),
+      Uri.parse('http:// 192.168.2.138:5506/reportByWorkOrderId/${widget.workOrderId}'),
       headers: {
         'Authorization': 'Bearer $token',
       },

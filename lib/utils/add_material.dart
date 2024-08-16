@@ -35,7 +35,7 @@ class _MaterialPageState extends State<MaterialPage> {
     }
 
     final response = await http.get(
-      Uri.parse('http://localhost:5506/displayMaterials'),
+      Uri.parse('http:// 192.168.2.138:5506/displayMaterials'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -76,7 +76,7 @@ class _MaterialPageState extends State<MaterialPage> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://localhost:5506/createMaterial'),
+      Uri.parse('http:// 192.168.2.138:5506/createMaterial'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;
@@ -117,7 +117,7 @@ class _MaterialPageState extends State<MaterialPage> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://localhost:5506/deleteMaterial/$id'),
+      Uri.parse('http:// 192.168.2.138:5506/deleteMaterial/$id'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -302,7 +302,7 @@ class _AddMaterialFormState extends State<AddMaterialForm> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://localhost:5506/createMaterial'),
+      Uri.parse('http:// 192.168.2.138:5506/createMaterial'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;

@@ -65,7 +65,7 @@ class _HomeFormState extends State<HomeForm> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://localhost:5506/registerPerson'),
+      Uri.parse('http:// 192.168.2.138:5506/registerPerson'),
     );
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = name;

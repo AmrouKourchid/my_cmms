@@ -31,7 +31,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   Future<void> _fetchAssets() async {
     final response = await http.get(
-      Uri.parse('http://localhost:5506/fetchAssets'),
+      Uri.parse('http:// 192.168.2.138:5506/fetchAssets'),
       headers: {
         'Authorization': 'Bearer ${widget.token}',
       },
@@ -58,7 +58,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     var payloadMap = json.decode(decoded);
 
     final response = await http.post(
-      Uri.parse('http://localhost:5506/createWorkRequest'),
+      Uri.parse('http:// 192.168.2.138:5506/createWorkRequest'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${widget.token}',
