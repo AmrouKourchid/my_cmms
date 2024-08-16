@@ -142,7 +142,18 @@ class _AddReportState extends State<AddReport> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Submit Report', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Submit Report', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Icon(Icons.close, color: Colors.black, size: 24),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       const Text('Work Order:'),
                       Text('${widget.workOrderId}', style: const TextStyle(fontSize: 16)),
@@ -189,31 +200,6 @@ class _AddReportState extends State<AddReport> {
                           const SizedBox(height: 20),
                         ],
                       )),
-                      const SizedBox(height: 20),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: _selectedMaterials.map((material) {
-                          return Chip(
-                            avatar: CircleAvatar(
-                              backgroundImage: material['image'] != null
-                                  ? MemoryImage(base64Decode(material['image']))
-                                  : null,
-                              child: material['image'] == null ? const Icon(Icons.image) : null,
-                            ),
-                            label: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(material['name']),
-                                Text(material['cost'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                              ],
-                            ),
-                            onDeleted: () {
-                              _selectMaterial(material);
-                            },
-                          );
-                        }).toList(),
-                      ),
                       const SizedBox(height: 20),
                       GestureDetector(
                         onTap: () async {
@@ -270,6 +256,31 @@ class _AddReportState extends State<AddReport> {
                           ),
                           child: const Text('Materials Used'),
                         ),
+                      ),
+                      const SizedBox(height: 20),
+                        Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: _selectedMaterials.map((material) {
+                          return Chip(
+                            avatar: CircleAvatar(
+                              backgroundImage: material['image'] != null
+                                  ? MemoryImage(base64Decode(material['image']))
+                                  : null,
+                              child: material['image'] == null ? const Icon(Icons.image) : null,
+                            ),
+                            label: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(material['name']),
+                                Text(material['cost'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                              ],
+                            ),
+                            onDeleted: () {
+                              _selectMaterial(material);
+                            },
+                          );
+                        }).toList(),
                       ),
                       const SizedBox(height: 20),
                       GestureDetector(

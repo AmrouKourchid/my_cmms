@@ -144,6 +144,7 @@ class _MaterialPageState extends State<MaterialPage> {
       context: context,
       builder: (context) {
         return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 90.0),
           child: AddMaterialForm(
             addMaterial: _addMaterial,
             onMaterialAdded: _fetchMaterials,

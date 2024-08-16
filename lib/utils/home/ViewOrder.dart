@@ -379,7 +379,7 @@ class _ViewReportState extends State<ViewReport> {
 
   Widget _buildReadOnlyTextField(String label, String? value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
       child: TextField(
         controller: TextEditingController(text: value ?? 'Not available'), // Use a fallback value if null
         decoration: InputDecoration(
@@ -415,6 +415,7 @@ class _ViewReportState extends State<ViewReport> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 24),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),

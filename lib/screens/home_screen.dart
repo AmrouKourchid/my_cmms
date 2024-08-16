@@ -295,15 +295,16 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () => _onSelectItem(2),
             ),
             ListTile(
-              leading: const Icon(Icons.account_balance),
-              title: const Text('Assets'),
-              onTap: () => _onSelectItem(3),
-            ),
-            ListTile(
               leading: const Icon(Icons.report),
               title: const Text('View Work Requests'),
               onTap: () => _onSelectItem(4),
             ),
+            ListTile(
+              leading: const Icon(Icons.account_balance),
+              title: const Text('Assets'),
+              onTap: () => _onSelectItem(3),
+            ),
+            
             ListTile(
               leading: const Icon(Icons.exit_to_app),
               title: const Text('Logout'),

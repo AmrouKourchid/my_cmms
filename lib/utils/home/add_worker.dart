@@ -124,7 +124,9 @@ class _HomeFormState extends State<HomeForm> {
             Form(
               key: _formKey,
               autovalidateMode: AutovalidateMode.disabled,
-              child: SingleChildScrollView(
+              child: ScrollConfiguration(
+                behavior: const ScrollBehavior().copyWith(overscroll: false),
+                child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -292,6 +294,7 @@ class _HomeFormState extends State<HomeForm> {
                   ],
                 ),
               ),
+            ),
             ),
             Positioned(
               top: 0,

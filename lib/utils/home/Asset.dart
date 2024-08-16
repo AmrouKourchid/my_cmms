@@ -238,6 +238,7 @@ class _AssetPageState extends State<AssetPage> {
       context: context,
       builder: (context) {
         return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 90.0),
           child: AddAssetForm(
             addAsset: _addAsset,
             onAssetAdded: _fetchAssets,
